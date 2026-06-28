@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { redirect } from "next/navigation";
 import { getVendorFromCookies } from "@/lib/vendorAuth";
 import { prisma } from "@/lib/prisma";
