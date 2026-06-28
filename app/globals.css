@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #f7efe2;
+  --font-jakarta: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-jakarta);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-jakarta), system-ui, sans-serif;
+}
+
+/* Display headlines */
+.font-display {
+  font-family: 'Clash Display', var(--font-jakarta), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+}
+
+/* Uppercase eyebrow labels */
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-weight: 600;
+  font-size: 0.72rem;
+}
+
+/* Mono */
+.font-mono-tk {
+  font-family: ui-monospace, monospace;
+}
+
+/* Dark inputs */
+.tk-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f7efe2;
+  border-radius: 14px;
+  padding: 13px 16px;
+  font-size: 15px;
+  font-family: var(--font-jakarta), system-ui, sans-serif;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.tk-input::placeholder { color: rgba(247, 239, 226, 0.34); }
+.tk-input:focus {
+  outline: none;
+  border-color: #81a6c6;
+  box-shadow: 0 0 0 3px rgba(129, 166, 198, 0.22);
+}
+
+/* Light surface inputs (storefront) */
+.tk-input-light {
+  width: 100%;
+  background: #ffffff;
+  border: 1.5px solid #e5e7eb;
+  color: #111111;
+  border-radius: 14px;
+  padding: 13px 16px;
+  font-size: 15px;
+  font-family: var(--font-jakarta), system-ui, sans-serif;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.tk-input-light::placeholder { color: #9ca3af; }
+.tk-input-light:focus {
+  outline: none;
+  border-color: #c4f23a;
+  box-shadow: 0 0 0 3px rgba(196, 242, 58, 0.18);
+}
+
+/* Brand spinner */
+.tk-spinner {
+  width: 46px; height: 46px; border-radius: 50%;
+  border: 4px solid rgba(129, 166, 198, 0.2);
+  border-top-color: #81a6c6;
+  animation: tk-spin 0.9s linear infinite;
+}
+@keyframes tk-spin { to { transform: rotate(360deg); } }
+
+/* Rise animation */
+.rise { animation: tk-rise 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+@media (prefers-reduced-motion: reduce) { .rise { animation: none; } }
+@keyframes tk-rise {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Float */
+@media (prefers-reduced-motion: no-preference) {
+  .floaty   { animation: floaty 8s   ease-in-out infinite; }
+  .floaty-2 { animation: floaty 9.5s ease-in-out infinite; animation-delay: -3s; }
+}
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+/* Hide scrollbars */
+.no-sb::-webkit-scrollbar { display: none; }
+.no-sb { -ms-overflow-style: none; scrollbar-width: none; }

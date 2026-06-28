@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ─── Vendor (store owner) ─────────────────────────────────────────────────────
+
+model Vendor {
+  id                     String   @id @default(cuid())
+  name                   String
+  email                  String   @unique
+  passwordHash           String
+  // Store identity
+  storeName              String
+  storeSlug              String   @unique
+  storeDescription       String   @default("")
+  logoUrl                String   @default("")
+  bannerUrl              String   @default("")
+  // Approval
+  isApproved             Boolean  @default(false)
+  isActive               Boolean  @default(true)
+  // Paystack payout setup (set by platform after approval)
+  paystackSubaccountCode String?
+  bankCode               String?
+  bankName               String?
+  accountNumber          String?
+  accountName            String?
+  // Economics (basis points)
+  platformFeeBps         Int      @default(500)   // 5% platform cut
+  commissionBps          Int      @default(1500)  // 15% affiliate commission
+  // Affiliate settings
+  allowPublicAffiliate   Boolean  @default(true)
+  // Verification
+  businessPageUrl        String   @default("")
+  // Social links
+  socialInstagram        String   @default("")
+  socialFacebook         String   @default("")
+  socialWhatsapp         String   @default("")
+  // Password reset
+  resetToken             String?
+  resetTokenExpiresAt    DateTime?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  products   Product[]
+  orders     Order[]
+  affiliates Affiliate[]
+
+  @@index([storeSlug])
+}
+
+// ─── Product catalog ──────────────────────────────────────────────────────────
+
+model Product {
+  id            String           @id @default(cuid())
+  vendorId      String
+  vendor        Vendor           @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  name          String
+  category      String           @default("")
+  description   String           @default("")
+  images        String           @default("")  // comma-separated Cloudinary URLs
+  basePriceKobo Int
+  stockCount    Int              @default(0)
+  isActive      Boolean          @default(true)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  variants   ProductVariant[]
+  orderItems OrderItem[]
+
+  @@index([vendorId])
+}
+
+model ProductVariant {
+  id           String    @id @default(cuid())
+  productId    String
+  product      Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  label        String
+  priceOffset  Int       @default(0)   // added to product.basePriceKobo
+  stockCount   Int       @default(0)
+  sku          String?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  orderItems OrderItem[]
+
+  @@index([productId])
+}
+
+// ─── Orders ───────────────────────────────────────────────────────────────────
+
+model Order {
+  id              String      @id @default(cuid())
+  vendorId        String
+  vendor          Vendor      @relation(fields: [vendorId], references: [id])
+  affiliateId     String?
+  affiliate       Affiliate?  @relation(fields: [affiliateId], references: [id])
+  // Buyer
+  buyerName       String
+  buyerEmail      String
+  buyerPhone      String
+  deliveryAddress String
+  deliveryState   String
+  deliveryNote    String      @default("")
+  // Payment
+  reference       String      @unique
+  status          String      @default("pending") // pending | paid | fulfilled | cancelled
+  totalAmount     Int
+  platformFeeAmount Int       @default(0)
+  affiliateAmount Int         @default(0)
+  vendorAmount    Int         @default(0)
+  affiliatePaidOut Boolean    @default(false)
+  paidAt          DateTime?
+  fulfilledAt     DateTime?
+  confirmationEmailedAt DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  items           OrderItem[]
+  affiliatePayout AffiliatePayout?
+
+  @@index([vendorId])
+  @@index([buyerEmail])
+  @@index([reference])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id           String          @id @default(cuid())
+  orderId      String
+  order        Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product         @relation(fields: [productId], references: [id])
+  variantId    String?
+  variant      ProductVariant? @relation(fields: [variantId], references: [id])
+  // Snapshot at purchase time — never mutated
+  productName  String
+  variantLabel String          @default("")
+  priceKobo    Int
+  quantity     Int
+
+  @@index([orderId])
+}
+
+// ─── Affiliates ───────────────────────────────────────────────────────────────
+
+model Affiliate {
+  id                    String   @id @default(cuid())
+  vendorId              String
+  vendor                Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  name                  String
+  email                 String
+  passwordHash          String?  // null until onboarding completes
+  code                  String   @unique
+  // How this affiliate joined
+  source                String   @default("public") // buyer | public
+  // Payout details
+  bankCode              String?
+  bankName              String?
+  accountNumber         String?
+  accountName           String?
+  paystackRecipientCode String?
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+
+  orders   Order[]
+  payouts  AffiliatePayout[]
+
+  @@unique([vendorId, email])
+  @@index([vendorId])
+  @@index([code])
+}
+
+model AffiliatePayout {
+  id                   String    @id @default(cuid())
+  affiliateId          String
+  affiliate            Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  orderId              String    @unique  // one payout record per order payout cycle
+  order                Order     @relation(fields: [orderId], references: [id])
+  amount               Int
+  paystackTransferCode String?
+  status               String    @default("pending") // pending | success | failed
+  createdAt            DateTime  @default(now())
+
+  @@index([affiliateId])
+}
+
+// ─── Rate limiting ────────────────────────────────────────────────────────────
+
+model RateLimit {
+  key     String @id
+  count   Int    @default(0)
+  resetAt Int    // Unix seconds
+}
