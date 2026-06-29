@@ -23,6 +23,44 @@ export default function AdminSidebar({ vendor }: { vendor: VendorPayload }) {
   }
 
   return (
+    <>
+      {/* Mobile top bar */}
+      <div className="lg:hidden" style={{ position: "sticky", top: 0, zIndex: 50, background: "white", borderBottom: "1px solid #EBEBEB", padding: "0 16px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Link href="/admin/dashboard" style={{ textDecoration: "none" }}>
+          <Image src="/logo.png" alt="Teaketer" width={100} height={24} style={{ objectFit: "contain", display: "block" }} />
+        </Link>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {/* Mobile nav links */}
+          {NAV.map((n) => {
+            const on = pathname?.startsWith(n.href);
+            return (
+              <Link key={n.href} href={n.href}
+                style={{ fontSize: 11, fontWeight: on ? 700 : 500, color: on ? "#1A1A1A" : "#999", textDecoration: "none", padding: "4px 6px" }}
+                className="hidden sm:block">
+                {n.label}
+              </Link>
+            );
+          })}
+          <button onClick={logout}
+            style={{ fontSize: 12, fontWeight: 700, color: "#888", border: "1px solid #EBEBEB", background: "white", borderRadius: 100, padding: "6px 14px", cursor: "pointer" }}>
+            Logout
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile bottom nav */}
+      <nav className="lg:hidden" style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50, background: "white", borderTop: "1px solid #EBEBEB", display: "flex", justifyContent: "space-around", padding: "8px 0 12px" }}>
+        {NAV.map((n) => {
+          const on = pathname?.startsWith(n.href);
+          return (
+            <Link key={n.href} href={n.href}
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", fontSize: 10, fontWeight: on ? 700 : 500, color: on ? "#1A1A1A" : "#BBB", textDecoration: "none", padding: "2px 8px" }}>
+              {n.label}
+            </Link>
+          );
+        })}
+      </nav>
+
     <aside
       className="hidden lg:flex flex-col shrink-0 fixed left-0 top-0 bottom-0 z-30"
       style={{ width: 248, background: "white", borderRight: "1px solid #EBEBEB", minHeight: "100vh" }}
@@ -68,5 +106,6 @@ export default function AdminSidebar({ vendor }: { vendor: VendorPayload }) {
         </button>
       </div>
     </aside>
+    </>
   );
 }

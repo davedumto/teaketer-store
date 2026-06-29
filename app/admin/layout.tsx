@@ -9,7 +9,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       {vendor && <AdminSidebar vendor={vendor} />}
       <main
         style={{ color: "#1A1A1A" }}
-        className={vendor ? "lg:ml-[248px]" : ""}
+        className={vendor ? "lg:ml-[248px] pb-20 lg:pb-0" : ""}
       >
         {children}
       </main>
