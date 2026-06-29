@@ -88,7 +88,7 @@ export default function HeroSlideshow({
           }}>
             Shop from<br />
             <em style={{ fontStyle: "italic", color: "#C4F23A" }}>independent</em><br />
-            <span style={{ fontWeight: 700, color: "rgba(255,255,255,0.65)" }}>Nigerian sellers.</span>
+            <span style={{ fontWeight: 700, color: "rgba(255,255,255,0.65)" }}>Nigerian vendors.</span>
           </h1>
 
           <div style={{ maxWidth: 320, flexShrink: 0, paddingBottom: 8, minWidth: 240 }}>
