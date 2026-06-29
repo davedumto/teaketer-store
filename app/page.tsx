@@ -128,39 +128,39 @@ export default async function HomePage() {
           <div className="tk-three-col" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
             {vendors.map((vendor, idx) => (
               <Link key={vendor.id} href={`/shop/${vendor.storeSlug}`} style={{ textDecoration: "none" }}>
-                <div className="tk-store-card" style={{ position: "relative", borderRadius: 20, overflow: "hidden", background: "#EDECEA", aspectRatio: idx === 0 ? "3/4" : "1/1.1" }}>
+                <div className="tk-store-card" style={{ position: "relative", borderRadius: 20, overflow: "hidden", background: "#F5F5F2", aspectRatio: idx === 0 ? "3/4" : "1/1.1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 24px 24px" }}>
 
-                  {/* Background image */}
-                  <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
-                    {vendor.bannerUrl
-                      ? <img src={vendor.bannerUrl} alt="" className="tk-store-img" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                      : <div style={{ width: "100%", height: "100%", background: `hsl(${(idx * 47) % 360}, 8%, ${88 - idx * 3}%)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <span className="tk-serif" style={{ fontSize: "5rem", fontWeight: 900, color: "rgba(0,0,0,0.06)", letterSpacing: "-0.05em" }}>{vendor.storeName.slice(0, 2).toUpperCase()}</span>
+                  {/* Blurred banner as background tint */}
+                  {vendor.bannerUrl && (
+                    <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+                      <img src={vendor.bannerUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", filter: "blur(32px) saturate(0.4) brightness(1.1)", transform: "scale(1.1)", opacity: 0.35 }} />
+                    </div>
+                  )}
+
+                  {/* Item count badge */}
+                  <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(0,0,0,0.07)", borderRadius: 100, padding: "4px 12px", fontSize: 11, fontWeight: 700, color: "#666", letterSpacing: "0.04em" }}>
+                    {vendor._count.products} items
+                  </div>
+
+                  {/* Logo */}
+                  <div style={{ position: "relative", zIndex: 1, marginBottom: 20 }}>
+                    {vendor.logoUrl
+                      ? <img src={vendor.logoUrl} alt={vendor.storeName} className="tk-store-img" style={{ width: 96, height: 96, borderRadius: 22, objectFit: "cover", boxShadow: "0 8px 32px rgba(0,0,0,0.12)", border: "3px solid white" }} />
+                      : <div style={{ width: 96, height: 96, borderRadius: 22, background: `hsl(${(idx * 47) % 360}, 20%, 82%)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 900, color: "white", boxShadow: "0 8px 32px rgba(0,0,0,0.10)" }}>
+                          {vendor.storeName.slice(0, 2).toUpperCase()}
                         </div>
                     }
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)" }} />
                   </div>
 
-                  {/* Top row: logo + product count */}
-                  <div style={{ position: "absolute", top: 16, left: 16, right: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    {vendor.logoUrl
-                      ? <img src={vendor.logoUrl} alt={vendor.storeName} style={{ width: 44, height: 44, borderRadius: 12, objectFit: "cover", background: "white", border: "2px solid rgba(255,255,255,0.25)" }} />
-                      : <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,0.15)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 900, color: "white" }}>{vendor.storeName.slice(0, 2).toUpperCase()}</div>
-                    }
-                    <div style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)", borderRadius: 100, padding: "4px 12px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: "0.04em" }}>
-                      {vendor._count.products} items
-                    </div>
-                  </div>
-
-                  {/* Bottom info */}
-                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 22px 22px" }}>
-                    <div style={{ fontSize: 17, fontWeight: 800, color: "white", letterSpacing: "-0.01em", marginBottom: 4 }}>{vendor.storeName}</div>
+                  {/* Info */}
+                  <div style={{ position: "relative", zIndex: 1, textAlign: "center" }}>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: "#1A1A1A", letterSpacing: "-0.01em", marginBottom: 4 }}>{vendor.storeName}</div>
                     {vendor.storeDescription && (
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", marginBottom: 14 }}>
+                      <div style={{ fontSize: 12, color: "#888", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", marginBottom: 16 }}>
                         {vendor.storeDescription}
                       </div>
                     )}
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "white", color: "#1A1A1A", borderRadius: 100, padding: "7px 16px", fontSize: 11, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#1A1A1A", color: "white", borderRadius: 100, padding: "7px 18px", fontSize: 11, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase" }}>
                       Shop now
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </div>
