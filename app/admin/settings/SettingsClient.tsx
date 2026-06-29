@@ -152,14 +152,18 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(""); setSuccess("");
+    const commissionBps = Math.round(Number(form.commissionPct) * 100);
+    if (isNaN(commissionBps) || commissionBps < 500 || commissionBps > 5000) {
+      setError("Commission rate must be between 5% and 50%.");
+      return;
+    }
     setSaving(true);
     try {
-      const commissionBps = Math.round(Number(form.commissionPct) * 100);
       const body: Record<string, unknown> = {
         storeName: form.storeName, storeDescription: form.storeDescription,
         logoUrl: form.logoUrl, bannerUrl: form.bannerUrl,
         allowPublicAffiliate: form.allowPublicAffiliate,
-        commissionBps,
+        commissionBps: commissionBps,
         socialInstagram: form.socialInstagram,
         socialFacebook: form.socialFacebook,
         socialWhatsapp: form.socialWhatsapp,

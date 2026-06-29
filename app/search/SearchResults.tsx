@@ -42,24 +42,42 @@ export default function SearchResults() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const search = useCallback(async (query: string) => {
     if (!query || query.length < 2) {
       setProducts([]); setStores([]); setSearched(false); return;
     }
+    // Cancel any in-flight request before starting a new one
+    abortRef.current?.abort();
+    abortRef.current = new AbortController();
     setLoading(true);
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`, {
+        signal: abortRef.current.signal,
+      });
+      if (!res.ok) { setProducts([]); setStores([]); setSearched(true); return; }
       const data = await res.json();
       setProducts(data.products ?? []);
       setStores(data.stores ?? []);
       setSearched(true);
+    } catch (err) {
+      if ((err as Error).name !== "AbortError") {
+        setProducts([]); setStores([]); setSearched(true);
+      }
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => { if (q) search(q); }, [q, search]);
+
+  // Keep input in sync with URL (browser back/forward)
+  useEffect(() => { setInput(q); }, [q]);
+
+  useEffect(() => {
+    return () => { if (debounce.current) clearTimeout(debounce.current); };
+  }, []);
 
   function handleInput(val: string) {
     setInput(val);
@@ -73,7 +91,7 @@ export default function SearchResults() {
     e.preventDefault();
     if (debounce.current) clearTimeout(debounce.current);
     router.replace(`/search?q=${encodeURIComponent(input)}`, { scroll: false });
-    search(input);
+    // useEffect fires search() when q updates from the URL change above
   }
 
   const showProducts = tab === "all" || tab === "products";
@@ -185,7 +203,7 @@ export default function SearchResults() {
               {products.map((product) => {
                 const img = product.images.split(",")[0]?.trim();
                 return (
-                  <Link key={product.id} href={`/shop/${product.vendor.storeSlug}`} style={{ textDecoration: "none" }}>
+                  <Link key={product.id} href={`/shop/${product.vendor.storeSlug}#product-${product.id}`} style={{ textDecoration: "none" }}>
                     <div style={{ borderRadius: 16, overflow: "hidden", background: "white", border: "1px solid #F0F0F0", cursor: "pointer", transition: "transform 0.2s, box-shadow 0.2s" }}
                       onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.08)"; }}
                       onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
@@ -217,7 +235,7 @@ export default function SearchResults() {
       </div>
 
       <style>{`
-        @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+        @keyframes spin { from { transform: translateY(-50%) rotate(0deg); } to { transform: translateY(-50%) rotate(360deg); } }
         input:focus { border-color: #1A1A1A !important; background: white !important; }
       `}</style>
     </div>

@@ -27,8 +27,7 @@ export async function PATCH(req: NextRequest) {
   if (typeof patch.allowPublicAffiliate === "boolean") {
     updateData.allowPublicAffiliate = patch.allowPublicAffiliate;
   }
-  if (typeof patch.commissionBps === "number") {
-    // Floor: 5% minimum (500 bps)
+  if (typeof patch.commissionBps === "number" && !isNaN(patch.commissionBps)) {
     if (patch.commissionBps < 500) {
       return NextResponse.json({ error: "Minimum commission rate is 5%." }, { status: 422 });
     }

@@ -76,7 +76,7 @@ function ProductCard({
   const outOfStock = stock === 0;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
+    <div id={`product-${product.id}`} style={{ display: "flex", flexDirection: "column" }}>
       {/* Image */}
       <div
         className="group"
