@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { prisma } from "@/lib/prisma";
 import { formatNaira } from "@/lib/utils";
+import { getSiteSetting } from "@/lib/siteSettings";
 
 export async function sendVendorRegistrationNotification({
   vendorName, storeName, email, businessPageUrl,
@@ -36,9 +37,13 @@ export async function sendVendorRegistrationNotification({
 </body>
 </html>`;
 
-  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL ?? process.env.SMTP_FROM ?? process.env.SMTP_USER;
+  const adminEmail =
+    (await getSiteSetting("admin_notification_email")) ??
+    process.env.ADMIN_NOTIFICATION_EMAIL ??
+    process.env.SMTP_FROM ??
+    process.env.SMTP_USER;
   if (!adminEmail) {
-    console.warn("[email] ADMIN_NOTIFICATION_EMAIL not set — skipping registration notification");
+    console.warn("[email] No admin notification email configured — skipping registration notification");
     return;
   }
   try {

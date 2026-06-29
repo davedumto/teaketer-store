@@ -206,6 +206,13 @@ model DeliveryZone {
   @@index([vendorId])
 }
 
+// ─── Site settings (singleton row, key=value) ────────────────────────────────
+
+model SiteSetting {
+  key       String @id
+  value     String
+}
+
 // ─── Rate limiting ────────────────────────────────────────────────────────────
 
 model RateLimit {
