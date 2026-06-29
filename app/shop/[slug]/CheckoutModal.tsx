@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { formatNaira } from "@/lib/utils";
 import type { CartItem } from "./StorefrontClient";
 
@@ -49,11 +49,22 @@ export default function CheckoutModal({
   const [error, setError] = useState("");
   const [codeInput, setCodeInput] = useState("");
   const [codeState, setCodeState] = useState<"idle" | "checking" | "ok" | "invalid">("idle");
+  const [deliveryZones, setDeliveryZones] = useState<{ state: string; feeKobo: number }[]>([]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    fetch(`/api/store/delivery-zones?slug=${encodeURIComponent(storeSlug)}`)
+      .then((r) => r.json())
+      .then((d) => setDeliveryZones(d.zones ?? []))
+      .catch(() => {});
+  }, [isOpen, storeSlug]);
 
   function set(field: string) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
       setForm((f) => ({ ...f, [field]: e.target.value }));
   }
+
+  const deliveryFee = deliveryZones.find((z) => z.state === form.state)?.feeKobo ?? null;
 
   async function applyCode() {
     const code = codeInput.trim().toUpperCase();
@@ -68,7 +79,8 @@ export default function CheckoutModal({
     }
   }
 
-  const total = cart.reduce((s, i) => s + i.priceKobo * i.quantity, 0);
+  const subtotal = cart.reduce((s, i) => s + i.priceKobo * i.quantity, 0);
+  const total = subtotal + (deliveryFee ?? 0);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -128,9 +140,23 @@ export default function CheckoutModal({
               </div>
             ))}
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 10, borderTop: "1px solid #EBEBEB" }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#1A1A1A" }}>Total</span>
-            <span style={{ fontSize: 18, fontWeight: 800, color: "#1A1A1A", letterSpacing: "-0.02em" }}>{formatNaira(total)}</span>
+          <div style={{ paddingTop: 10, borderTop: "1px solid #EBEBEB", display: "flex", flexDirection: "column", gap: 6 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+              <span style={{ color: "#666" }}>Subtotal</span>
+              <span style={{ fontWeight: 600, color: "#1A1A1A" }}>{formatNaira(subtotal)}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+              <span style={{ color: "#666" }}>Delivery</span>
+              <span style={{ fontWeight: 600, color: deliveryFee === null ? "#BBB" : deliveryFee === 0 ? "#2D6A00" : "#1A1A1A" }}>
+                {deliveryFee === null
+                  ? (form.state ? "Not available to this state" : "Select a state")
+                  : deliveryFee === 0 ? "Free" : formatNaira(deliveryFee)}
+              </span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 6, borderTop: "1px solid #EBEBEB" }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#1A1A1A" }}>Total</span>
+              <span style={{ fontSize: 18, fontWeight: 800, color: "#1A1A1A", letterSpacing: "-0.02em" }}>{formatNaira(total)}</span>
+            </div>
           </div>
         </div>
 

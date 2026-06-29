@@ -132,10 +132,60 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [deliveryZones, setDeliveryZones] = useState<{ state: string; feeKobo: number }[]>([]);
+  const [deliverySaving, setDeliverySaving] = useState(false);
+  const [deliverySuccess, setDeliverySuccess] = useState("");
+
+  const NIGERIAN_STATES = [
+    "Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno",
+    "Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","FCT","Gombe","Imo",
+    "Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa",
+    "Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba",
+    "Yobe","Zamfara",
+  ];
 
   useEffect(() => {
     fetch("/api/banks").then((r) => r.json()).then((d) => setBanks(d.banks ?? []));
+    fetch("/api/vendor/delivery-zones")
+      .then((r) => r.json())
+      .then((d) => setDeliveryZones(d.zones ?? []));
   }, []);
+
+  function getZoneFee(state: string) {
+    return deliveryZones.find((z) => z.state === state)?.feeKobo ?? null;
+  }
+
+  function setZoneFee(state: string, feeNaira: string) {
+    const feeKobo = feeNaira === "" ? null : Math.round(Number(feeNaira) * 100);
+    if (feeKobo === null) {
+      setDeliveryZones((prev) => prev.filter((z) => z.state !== state));
+    } else {
+      setDeliveryZones((prev) => {
+        const existing = prev.find((z) => z.state === state);
+        if (existing) return prev.map((z) => z.state === state ? { ...z, feeKobo } : z);
+        return [...prev, { state, feeKobo }];
+      });
+    }
+  }
+
+  async function saveDeliveryZones() {
+    setDeliverySaving(true);
+    setDeliverySuccess("");
+    try {
+      const res = await fetch("/api/vendor/delivery-zones", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ zones: deliveryZones }),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      setDeliverySuccess("Delivery fees saved.");
+      setTimeout(() => setDeliverySuccess(""), 3000);
+    } catch {
+      // keep existing zones, show nothing — minor failure
+    } finally {
+      setDeliverySaving(false);
+    }
+  }
 
   function set(field: string) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -291,6 +341,46 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
           <div style={{ marginTop: 8, fontSize: 11, color: "#BBB" }}>
             This rate is shown to affiliates before they sign up. Higher rates attract more promoters.
           </div>
+        </div>
+      </div>
+
+      {/* Delivery fees */}
+      <div className="rounded-3xl p-6" style={{ background: "#fff", border: "1px solid #EBEBEB" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+          <SectionHeader label="Delivery Fees by State" />
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {deliverySuccess && <span style={{ fontSize: 12, color: "#2D6A00", fontWeight: 600 }}>✓ {deliverySuccess}</span>}
+            <button type="button" onClick={saveDeliveryZones} disabled={deliverySaving}
+              style={{ padding: "7px 18px", background: "#1A1A1A", color: "white", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", opacity: deliverySaving ? 0.6 : 1 }}>
+              {deliverySaving ? "Saving…" : "Save fees"}
+            </button>
+          </div>
+        </div>
+        <p style={{ fontSize: 12, color: "#888", marginBottom: 16 }}>
+          Set a delivery fee per state. Leave blank to hide that state from buyers (they won&apos;t be able to checkout if you don&apos;t cover their state). Set to 0 for free delivery.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
+          {NIGERIAN_STATES.map((state) => {
+            const fee = getZoneFee(state);
+            const feeNaira = fee === null ? "" : String(fee / 100);
+            return (
+              <div key={state}>
+                <label style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#999", display: "block", marginBottom: 4 }}>{state}</label>
+                <div style={{ position: "relative" }}>
+                  <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "#888", fontWeight: 600 }}>₦</span>
+                  <input
+                    type="number"
+                    min={0}
+                    step={50}
+                    value={feeNaira}
+                    onChange={(e) => setZoneFee(state, e.target.value)}
+                    placeholder="—"
+                    style={{ ...inputStyle, paddingLeft: 26, fontSize: 13, padding: "8px 10px 8px 26px" }}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

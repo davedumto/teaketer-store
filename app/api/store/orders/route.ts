@@ -114,7 +114,17 @@ export async function POST(req: NextRequest) {
     resolvedItems.push({ productId, variantId: effectiveVariantId, productName: product.name, variantLabel, priceKobo, quantity });
   }
 
-  const totalAmount = resolvedItems.reduce((sum, i) => sum + i.priceKobo * i.quantity, 0);
+  const subtotalAmount = resolvedItems.reduce((sum, i) => sum + i.priceKobo * i.quantity, 0);
+
+  // Look up delivery fee server-side — not from client
+  const zones = await prisma.$queryRaw<{ feeKobo: number }[]>`
+    SELECT feeKobo FROM DeliveryZone
+    WHERE vendorId = ${vendor.id} AND state = ${deliveryState}
+    LIMIT 1
+  `;
+  const deliveryFee = zones[0]?.feeKobo ?? 0;
+  const totalAmount = subtotalAmount + deliveryFee;
+
   const { platformFeeAmount, affiliateAmount, vendorAmount } = computeSplit(
     totalAmount,
     vendor.platformFeeBps,
@@ -151,6 +161,11 @@ export async function POST(req: NextRequest) {
       },
     },
   });
+
+  // Stamp deliveryFee using raw SQL since generated client may not include the new column yet
+  if (deliveryFee > 0) {
+    await prisma.$executeRaw`UPDATE "Order" SET deliveryFee = ${deliveryFee} WHERE id = ${order.id}`;
+  }
 
   const callbackUrl = `${appUrl()}/shop/${storeSlug}/order/${reference}`;
 

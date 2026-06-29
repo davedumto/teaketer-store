@@ -46,9 +46,10 @@ model Vendor {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
-  products   Product[]
-  orders     Order[]
-  affiliates Affiliate[]
+  products       Product[]
+  orders         Order[]
+  affiliates     Affiliate[]
+  deliveryZones  DeliveryZone[]
 
   @@index([storeSlug])
 }
@@ -111,6 +112,7 @@ model Order {
   reference       String      @unique
   status          String      @default("pending") // pending | paid | fulfilled | cancelled
   totalAmount     Int
+  deliveryFee     Int         @default(0)
   platformFeeAmount Int       @default(0)
   affiliateAmount Int         @default(0)
   vendorAmount    Int         @default(0)
@@ -189,6 +191,19 @@ model AffiliatePayout {
   createdAt            DateTime  @default(now())
 
   @@index([affiliateId])
+}
+
+// ─── Delivery zones ──────────────────────────────────────────────────────────
+
+model DeliveryZone {
+  id        String  @id @default(cuid())
+  vendorId  String
+  vendor    Vendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  state     String  // Nigerian state name
+  feeKobo   Int     // delivery fee in kobo (0 = free)
+
+  @@unique([vendorId, state])
+  @@index([vendorId])
 }
 
 // ─── Rate limiting ────────────────────────────────────────────────────────────
