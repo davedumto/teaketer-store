@@ -13,7 +13,7 @@ export default async function AffiliateSignupPage({
 
   const vendor = await prisma.vendor.findUnique({
     where: { storeSlug: slug },
-    select: { storeName: true, storeSlug: true, allowPublicAffiliate: true, isApproved: true, isActive: true },
+    select: { storeName: true, storeSlug: true, allowPublicAffiliate: true, isApproved: true, isActive: true, commissionBps: true },
   });
 
   if (!vendor || !vendor.isApproved || !vendor.isActive) notFound();
@@ -27,5 +27,5 @@ export default async function AffiliateSignupPage({
     );
   }
 
-  return <AffiliateSignupClient storeName={vendor.storeName} storeSlug={slug} />;
+  return <AffiliateSignupClient storeName={vendor.storeName} storeSlug={slug} commissionBps={vendor.commissionBps} />;
 }

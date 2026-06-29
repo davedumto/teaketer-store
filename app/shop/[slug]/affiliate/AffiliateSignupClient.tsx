@@ -18,11 +18,14 @@ const lightInput: React.CSSProperties = {
 export default function AffiliateSignupClient({
   storeName,
   storeSlug,
+  commissionBps,
 }: {
   storeName: string;
   storeSlug: string;
+  commissionBps: number;
 }) {
   const router = useRouter();
+  const commissionPct = (commissionBps / 100).toFixed(0);
   const [banks, setBanks] = useState<{ name: string; code: string }[]>([]);
   const [form, setForm] = useState({ name: "", email: "", password: "", accountNumber: "", bankCode: "", bankName: "" });
   const [error, setError] = useState("");
@@ -81,7 +84,22 @@ export default function AffiliateSignupClient({
             {storeName} · Affiliates
           </div>
           <h1 className="font-display text-2xl mt-3" style={{ color: "#1A1A1A" }}>Join the program</h1>
-          <p className="text-sm mt-1" style={{ color: "#888" }}>Earn commission by referring customers</p>
+          <p className="text-sm mt-1" style={{ color: "#888" }}>Share your link. Earn every time someone buys.</p>
+
+          {/* Commission rate highlight */}
+          <div style={{ marginTop: 16, background: "#1A1A1A", borderRadius: 14, padding: "16px 20px", textAlign: "left" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(196,242,58,0.7)", marginBottom: 6 }}>Your commission rate</div>
+            <div style={{ fontSize: 36, fontWeight: 900, color: "#C4F23A", lineHeight: 1, marginBottom: 6 }}>{commissionPct}%</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", lineHeight: 1.5 }}>
+              You earn <strong style={{ color: "white" }}>₦{commissionPct} for every ₦100</strong> spent by customers you refer. Paid directly to your bank account after each order is fulfilled.
+            </div>
+          </div>
+
+          {/* Example */}
+          <div style={{ marginTop: 10, background: "#F5F5F2", borderRadius: 12, padding: "12px 16px", textAlign: "left", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: 12, color: "#888" }}>Example: ₦20,000 order</span>
+            <span style={{ fontSize: 14, fontWeight: 800, color: "#2D6A00" }}>+₦{(20000 * commissionBps / 10000).toLocaleString()} earned</span>
+          </div>
         </div>
 
         <div className="rounded-3xl p-6" style={{ background: "#fff", border: "1px solid #EBEBEB", borderRadius: 12 }}>

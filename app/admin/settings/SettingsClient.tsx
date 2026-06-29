@@ -118,6 +118,7 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
     logoUrl: vendor.logoUrl,
     bannerUrl: vendor.bannerUrl,
     allowPublicAffiliate: vendor.allowPublicAffiliate,
+    commissionPct: String(Math.round(vendor.commissionBps / 100)),
     accountNumber: vendor.accountNumber ?? "",
     bankCode: vendor.bankCode ?? "",
     bankName: vendor.bankName ?? "",
@@ -153,10 +154,12 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
     setError(""); setSuccess("");
     setSaving(true);
     try {
+      const commissionBps = Math.round(Number(form.commissionPct) * 100);
       const body: Record<string, unknown> = {
         storeName: form.storeName, storeDescription: form.storeDescription,
         logoUrl: form.logoUrl, bannerUrl: form.bannerUrl,
         allowPublicAffiliate: form.allowPublicAffiliate,
+        commissionBps,
         socialInstagram: form.socialInstagram,
         socialFacebook: form.socialFacebook,
         socialWhatsapp: form.socialWhatsapp,
@@ -247,20 +250,43 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
         </div>
       </div>
 
-      {/* Commission (read-only) */}
+      {/* Commission structure */}
       <div className="rounded-3xl p-6" style={{ background: "#fff", border: "1px solid #EBEBEB" }}>
-        <SectionHeader label="Commission Structure · Set by Teaketer" />
-        <div className="grid grid-cols-2 gap-4">
-          {[
-            { label: "Platform Fee", value: `${(vendor.platformFeeBps / 100).toFixed(1)}%` },
-            { label: "Affiliate Commission", value: `${(vendor.commissionBps / 100).toFixed(1)}%` },
-          ].map((s) => (
-            <div key={s.label} className="rounded-2xl p-4"
-              style={{ background: "#FAFAF8", border: "1px solid #EBEBEB" }}>
-              <div className="eyebrow mb-1.5" style={{ color: "#888", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>{s.label}</div>
-              <div className="font-display text-2xl" style={{ color: "#1A1A1A" }}>{s.value}</div>
+        <SectionHeader label="Affiliate Commission Rate" />
+
+        {/* Platform fee — read only */}
+        <div className="rounded-2xl p-4 mb-4" style={{ background: "#FAFAF8", border: "1px solid #EBEBEB" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#BBB", marginBottom: 4 }}>Platform Fee (Teaketer's cut · fixed)</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#1A1A1A" }}>{(vendor.platformFeeBps / 100).toFixed(1)}%</div>
+          <div style={{ fontSize: 12, color: "#999", marginTop: 4 }}>Deducted from every order. You keep the rest after affiliate commission.</div>
+        </div>
+
+        {/* Commission — editable */}
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#888", display: "block", marginBottom: 6 }}>
+            Affiliate Commission Rate
+          </label>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ position: "relative", flex: 1, maxWidth: 180 }}>
+              <input
+                type="number"
+                min={5}
+                max={50}
+                step={1}
+                value={form.commissionPct}
+                onChange={(e) => setForm((f) => ({ ...f, commissionPct: e.target.value }))}
+                style={{ ...inputStyle, paddingRight: 40 }}
+              />
+              <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, fontWeight: 700, color: "#888" }}>%</span>
             </div>
-          ))}
+            <div style={{ fontSize: 12, color: "#888" }}>Minimum 5% · Maximum 50%</div>
+          </div>
+          <div style={{ marginTop: 12, background: "#F0FDD4", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "#2D6A00" }}>
+            Example: on a ₦10,000 order → affiliate earns <strong>₦{(10000 * (Number(form.commissionPct) || 0) / 100).toLocaleString()}</strong>, you receive <strong>₦{(10000 * (1 - (vendor.platformFeeBps / 10000) - (Number(form.commissionPct) || 0) / 100)).toLocaleString()}</strong>
+          </div>
+          <div style={{ marginTop: 8, fontSize: 11, color: "#BBB" }}>
+            This rate is shown to affiliates before they sign up. Higher rates attract more promoters.
+          </div>
         </div>
       </div>
 

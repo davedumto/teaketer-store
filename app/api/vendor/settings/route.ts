@@ -27,6 +27,16 @@ export async function PATCH(req: NextRequest) {
   if (typeof patch.allowPublicAffiliate === "boolean") {
     updateData.allowPublicAffiliate = patch.allowPublicAffiliate;
   }
+  if (typeof patch.commissionBps === "number") {
+    // Floor: 5% minimum (500 bps)
+    if (patch.commissionBps < 500) {
+      return NextResponse.json({ error: "Minimum commission rate is 5%." }, { status: 422 });
+    }
+    if (patch.commissionBps > 5000) {
+      return NextResponse.json({ error: "Maximum commission rate is 50%." }, { status: 422 });
+    }
+    updateData.commissionBps = patch.commissionBps;
+  }
   if (typeof patch.socialInstagram === "string") updateData.socialInstagram = patch.socialInstagram.trim();
   if (typeof patch.socialFacebook === "string")  updateData.socialFacebook  = patch.socialFacebook.trim();
   if (typeof patch.socialWhatsapp === "string")  updateData.socialWhatsapp  = patch.socialWhatsapp.trim();
