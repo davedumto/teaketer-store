@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const LINKS = [
   { label: "Stores", href: "#stores" },
@@ -11,6 +12,23 @@ const LINKS = [
 
 export default function HomeNav() {
   const [open, setOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchVal, setSearchVal] = useState("");
+  const router = useRouter();
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  function openSearch() {
+    setSearchOpen(true);
+    setTimeout(() => searchRef.current?.focus(), 50);
+  }
+
+  function submitSearch(e?: React.FormEvent) {
+    e?.preventDefault();
+    if (searchVal.trim().length < 2) return;
+    router.push(`/search?q=${encodeURIComponent(searchVal.trim())}`);
+    setSearchOpen(false);
+    setSearchVal("");
+  }
 
   return (
     <>
@@ -25,6 +43,9 @@ export default function HomeNav() {
             {LINKS.map((l) => (
               <a key={l.label} href={l.href} className="tk-nav-link" style={{ fontSize: 13, color: "#999", textDecoration: "none", fontWeight: 500 }}>{l.label}</a>
             ))}
+            <button onClick={openSearch} aria-label="Search" style={{ background: "none", border: "none", cursor: "pointer", padding: 4, color: "#999", display: "flex", alignItems: "center" }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </button>
             <div style={{ width: 1, height: 16, background: "#E0E0DB" }} />
             <Link href="/affiliate/login" className="tk-nav-link" style={{ fontSize: 13, color: "#999", textDecoration: "none", fontWeight: 500 }}>Affiliate login</Link>
             <Link href="/admin/login" className="tk-nav-link" style={{ fontSize: 13, color: "#999", textDecoration: "none", fontWeight: 500 }}>Vendor login</Link>
@@ -33,8 +54,11 @@ export default function HomeNav() {
             </Link>
           </div>
 
-          {/* Mobile right side: Sell button + hamburger */}
+          {/* Mobile right side: Search + Sell button + hamburger */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }} className="tk-nav-mobile-right">
+            <button onClick={openSearch} aria-label="Search" style={{ background: "none", border: "none", cursor: "pointer", padding: 4, color: "#1A1A1A", display: "flex", alignItems: "center" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </button>
             <Link href="/admin/register" style={{ fontSize: 11, fontWeight: 700, color: "white", textDecoration: "none", padding: "8px 16px", background: "#1A1A1A", borderRadius: 100, letterSpacing: "0.06em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
               Sell
             </Link>
@@ -95,6 +119,29 @@ export default function HomeNav() {
                 Sell with us
               </Link>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Search overlay */}
+      {searchOpen && (
+        <div onClick={() => setSearchOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: 80 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: 600, margin: "0 16px" }}>
+            <form onSubmit={submitSearch}>
+              <div style={{ position: "relative" }}>
+                <svg style={{ position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)", color: "#BBB" }} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input
+                  ref={searchRef}
+                  value={searchVal}
+                  onChange={(e) => setSearchVal(e.target.value)}
+                  onKeyDown={(e) => e.key === "Escape" && setSearchOpen(false)}
+                  placeholder="Search products, stores…"
+                  style={{ width: "100%", paddingLeft: 56, paddingRight: 60, paddingTop: 18, paddingBottom: 18, borderRadius: 16, border: "none", fontSize: 18, fontWeight: 500, outline: "none", background: "white", color: "#1A1A1A", boxSizing: "border-box", boxShadow: "0 24px 64px rgba(0,0,0,0.2)" }}
+                />
+                <button type="submit" style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "#1A1A1A", color: "white", border: "none", borderRadius: 10, padding: "8px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", letterSpacing: "0.04em" }}>Search</button>
+              </div>
+            </form>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, marginTop: 12, textAlign: "center" }}>Press Esc to close</p>
           </div>
         </div>
       )}
