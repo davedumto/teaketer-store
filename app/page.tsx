@@ -141,9 +141,15 @@ export default async function HomePage() {
                     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)" }} />
                   </div>
 
-                  {/* Product count */}
-                  <div style={{ position: "absolute", top: 20, right: 20, background: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)", borderRadius: 100, padding: "4px 12px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: "0.04em" }}>
-                    {vendor._count.products} items
+                  {/* Top row: logo + product count */}
+                  <div style={{ position: "absolute", top: 16, left: 16, right: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    {vendor.logoUrl
+                      ? <img src={vendor.logoUrl} alt={vendor.storeName} style={{ width: 44, height: 44, borderRadius: 12, objectFit: "cover", background: "white", border: "2px solid rgba(255,255,255,0.25)" }} />
+                      : <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,0.15)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 900, color: "white" }}>{vendor.storeName.slice(0, 2).toUpperCase()}</div>
+                    }
+                    <div style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)", borderRadius: 100, padding: "4px 12px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: "0.04em" }}>
+                      {vendor._count.products} items
+                    </div>
                   </div>
 
                   {/* Bottom info */}
