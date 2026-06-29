@@ -64,7 +64,12 @@ export default function CheckoutModal({
       setForm((f) => ({ ...f, [field]: e.target.value }));
   }
 
-  const deliveryFee = deliveryZones.find((z) => z.state === form.state)?.feeKobo ?? null;
+  const hasAnyZones = deliveryZones.length > 0;
+  const deliveryFee = !form.state
+    ? null
+    : !hasAnyZones
+    ? 0  // vendor hasn't configured zones — treat as free (no delivery restriction)
+    : (deliveryZones.find((z) => z.state === form.state)?.feeKobo ?? -1); // -1 = state not served
 
   async function applyCode() {
     const code = codeInput.trim().toUpperCase();
@@ -80,10 +85,12 @@ export default function CheckoutModal({
   }
 
   const subtotal = cart.reduce((s, i) => s + i.priceKobo * i.quantity, 0);
-  const total = subtotal + (deliveryFee ?? 0);
+  const stateNotServed = deliveryFee === -1;
+  const total = subtotal + (deliveryFee !== null && deliveryFee >= 0 ? deliveryFee : 0);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (stateNotServed) return;
     setError("");
     setLoading(true);
     try {
@@ -147,12 +154,19 @@ export default function CheckoutModal({
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
               <span style={{ color: "#666" }}>Delivery</span>
-              <span style={{ fontWeight: 600, color: deliveryFee === null ? "#BBB" : deliveryFee === 0 ? "#2D6A00" : "#1A1A1A" }}>
-                {deliveryFee === null
-                  ? (form.state ? "Not available to this state" : "Select a state")
+              <span style={{ fontWeight: 600, color: stateNotServed ? "#DC2626" : deliveryFee === null ? "#BBB" : deliveryFee === 0 ? "#2D6A00" : "#1A1A1A" }}>
+                {stateNotServed
+                  ? "Not available to this state"
+                  : deliveryFee === null
+                  ? "Select a state"
                   : deliveryFee === 0 ? "Free" : formatNaira(deliveryFee)}
               </span>
             </div>
+            {stateNotServed && (
+              <p style={{ margin: "2px 0 0", fontSize: 11, color: "#DC2626" }}>
+                This store doesn&apos;t deliver to {form.state}. Please select a different state or contact the vendor.
+              </p>
+            )}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 6, borderTop: "1px solid #EBEBEB" }}>
               <span style={{ fontSize: 13, fontWeight: 700, color: "#1A1A1A" }}>Total</span>
               <span style={{ fontSize: 18, fontWeight: 800, color: "#1A1A1A", letterSpacing: "-0.02em" }}>{formatNaira(total)}</span>
@@ -236,9 +250,9 @@ export default function CheckoutModal({
             </div>
           )}
 
-          <button type="submit" disabled={loading}
-            style={{ width: "100%", padding: "14px", background: loading ? "#888" : "#1A1A1A", color: "white", border: "none", borderRadius: 8, cursor: loading ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", marginTop: 4 }}>
-            {loading ? "Processing…" : `Pay ${formatNaira(total)} via Paystack`}
+          <button type="submit" disabled={loading || stateNotServed}
+            style={{ width: "100%", padding: "14px", background: loading || stateNotServed ? "#888" : "#1A1A1A", color: "white", border: "none", borderRadius: 8, cursor: loading || stateNotServed ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", marginTop: 4 }}>
+            {loading ? "Processing…" : stateNotServed ? "Delivery not available" : `Pay ${formatNaira(total)} via Paystack`}
           </button>
           <p style={{ textAlign: "center", fontSize: 11, color: "#BBB", margin: 0 }}>Payments are secured by Paystack</p>
         </form>

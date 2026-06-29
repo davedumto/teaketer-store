@@ -135,6 +135,7 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
   const [deliveryZones, setDeliveryZones] = useState<{ state: string; feeKobo: number }[]>([]);
   const [deliverySaving, setDeliverySaving] = useState(false);
   const [deliverySuccess, setDeliverySuccess] = useState("");
+  const [deliveryError, setDeliveryError] = useState("");
 
   const NIGERIAN_STATES = [
     "Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno",
@@ -156,32 +157,38 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
   }
 
   function setZoneFee(state: string, feeNaira: string) {
-    const feeKobo = feeNaira === "" ? null : Math.round(Number(feeNaira) * 100);
-    if (feeKobo === null) {
+    if (feeNaira === "") {
       setDeliveryZones((prev) => prev.filter((z) => z.state !== state));
-    } else {
-      setDeliveryZones((prev) => {
-        const existing = prev.find((z) => z.state === state);
-        if (existing) return prev.map((z) => z.state === state ? { ...z, feeKobo } : z);
-        return [...prev, { state, feeKobo }];
-      });
+      return;
     }
+    const parsed = Number(feeNaira);
+    if (isNaN(parsed) || parsed < 0) return; // ignore invalid input silently — number input enforces min=0
+    const feeKobo = Math.round(parsed * 100);
+    setDeliveryZones((prev) => {
+      const existing = prev.find((z) => z.state === state);
+      if (existing) return prev.map((z) => z.state === state ? { ...z, feeKobo } : z);
+      return [...prev, { state, feeKobo }];
+    });
   }
 
   async function saveDeliveryZones() {
     setDeliverySaving(true);
     setDeliverySuccess("");
+    setDeliveryError("");
     try {
       const res = await fetch("/api/vendor/delivery-zones", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ zones: deliveryZones }),
       });
-      if (!res.ok) throw new Error("Failed to save");
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error ?? "Failed to save delivery fees.");
+      }
       setDeliverySuccess("Delivery fees saved.");
       setTimeout(() => setDeliverySuccess(""), 3000);
-    } catch {
-      // keep existing zones, show nothing — minor failure
+    } catch (err) {
+      setDeliveryError(err instanceof Error ? err.message : "Failed to save delivery fees.");
     } finally {
       setDeliverySaving(false);
     }
@@ -350,6 +357,7 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
           <SectionHeader label="Delivery Fees by State" />
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {deliverySuccess && <span style={{ fontSize: 12, color: "#2D6A00", fontWeight: 600 }}>✓ {deliverySuccess}</span>}
+            {deliveryError && <span style={{ fontSize: 12, color: "#DC2626", fontWeight: 600 }}>{deliveryError}</span>}
             <button type="button" onClick={saveDeliveryZones} disabled={deliverySaving}
               style={{ padding: "7px 18px", background: "#1A1A1A", color: "white", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", opacity: deliverySaving ? 0.6 : 1 }}>
               {deliverySaving ? "Saving…" : "Save fees"}
@@ -373,7 +381,7 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
                     min={0}
                     step={50}
                     value={feeNaira}
-                    onChange={(e) => setZoneFee(state, e.target.value)}
+                    onChange={(e) => { setDeliveryError(""); setZoneFee(state, e.target.value); }}
                     placeholder="—"
                     style={{ ...inputStyle, paddingLeft: 26, fontSize: 13, padding: "8px 10px 8px 26px" }}
                   />
