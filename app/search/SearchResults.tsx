@@ -103,9 +103,10 @@ export default function SearchResults() {
 
       {/* Top bar */}
       <div style={{ background: "white", borderBottom: "1px solid #EBEBEB", position: "sticky", top: 0, zIndex: 40 }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "14px 24px", display: "flex", alignItems: "center", gap: 16 }}>
-          <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
-            <Image src="/logo.png" alt="Teaketer" width={100} height={24} style={{ objectFit: "contain", display: "block" }} />
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "14px 24px", display: "flex", alignItems: "center", gap: 12 }}>
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#1A1A1A", flexShrink: 0 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <Image src="/logo.png" alt="Teaketer" width={90} height={22} style={{ objectFit: "contain", display: "block" }} />
           </Link>
 
           {/* Search bar */}
