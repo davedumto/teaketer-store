@@ -86,9 +86,9 @@ export default function HeroSlideshow({
             fontSize: "clamp(2.8rem, 7vw, 7.5rem)", fontWeight: 900, color: "white",
             lineHeight: 0.92, letterSpacing: "-0.03em", margin: 0, maxWidth: 760,
           }}>
-            Made by<br />
-            <em style={{ fontStyle: "italic", color: "#C4F23A" }}>Nigerians.</em><br />
-            <span style={{ fontWeight: 700, color: "rgba(255,255,255,0.65)" }}>Loved by all.</span>
+            Shop from<br />
+            <em style={{ fontStyle: "italic", color: "#C4F23A" }}>independent</em><br />
+            <span style={{ fontWeight: 700, color: "rgba(255,255,255,0.65)" }}>Nigerian sellers.</span>
           </h1>
 
           <div style={{ maxWidth: 320, flexShrink: 0, paddingBottom: 8, minWidth: 240 }}>
