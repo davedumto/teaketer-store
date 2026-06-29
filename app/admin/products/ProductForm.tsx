@@ -11,9 +11,18 @@ interface Variant {
   sku: string;
 }
 
-const CATEGORIES = [
-  "Fashion", "Beauty", "Skincare", "Haircare", "Food & Drinks",
-  "Electronics", "Home & Living", "Health & Wellness", "Accessories", "Other",
+const CATEGORY_GROUPS = [
+  { group: "Fragrance & Beauty", items: ["Perfume", "Cologne", "Body Mist & Sprays", "Lip Gloss", "Lipstick & Lip Care", "Foundation & Concealer", "Eyeshadow & Eye Makeup", "Mascara & Lashes", "Blush, Bronzer & Highlighter", "Makeup Sets & Kits", "Nail Polish & Nail Care"] },
+  { group: "Skincare", items: ["Skincare", "Face Masks & Treatments", "Moisturisers & Serums", "Sunscreen & SPF", "Body Lotion & Oils", "Scrubs & Exfoliants"] },
+  { group: "Hair", items: ["Wigs & Weaves", "Hair Extensions", "Natural Hair Care", "Hair Growth Products", "Hair Oils & Treatments", "Shampoo & Conditioner", "Styling Products"] },
+  { group: "Fashion & Apparel", items: ["Women's Clothing", "Men's Clothing", "Children's Clothing", "Underwear & Lingerie", "Sportswear & Activewear", "Traditional Attire"] },
+  { group: "Shoes & Accessories", items: ["Shoes & Footwear", "Bags & Purses", "Jewellery", "Watches", "Sunglasses", "Belts & Wallets", "Hats & Caps", "Accessories"] },
+  { group: "Food & Drinks", items: ["Snacks & Confectionery", "Drinks & Beverages", "Packaged Foods", "Spices & Seasonings", "Organic & Natural Foods", "Baked Goods", "Homemade & Artisan Foods"] },
+  { group: "Health & Wellness", items: ["Vitamins & Supplements", "Herbal & Natural Remedies", "Feminine Hygiene", "Baby & Toddler Care", "Dental Care", "Personal Hygiene"] },
+  { group: "Home & Living", items: ["Home Decor", "Candles & Diffusers", "Bedding & Linen", "Kitchen & Dining", "Cleaning & Laundry", "Storage & Organisation", "Furniture & Furnishings"] },
+  { group: "Electronics & Tech", items: ["Phone Accessories", "Gadgets & Tech", "Cables & Chargers", "Audio & Earphones", "Cameras & Photography", "Computers & Tablets"] },
+  { group: "Art, Craft & Gifting", items: ["Art & Prints", "Handmade & Crafts", "Gift Sets", "Stationery & Books"] },
+  { group: "Other", items: ["Pet Supplies", "Sports & Fitness", "Toys & Games", "Auto Accessories", "Other"] },
 ];
 
 interface ProductFormProps {
@@ -183,7 +192,11 @@ export default function ProductForm({ productId, initial }: ProductFormProps) {
             <label style={labelStyle}>Category</label>
             <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ ...inp, appearance: "none" }} className="tk-input">
               <option value="">Select a category…</option>
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              {CATEGORY_GROUPS.map((g) => (
+                <optgroup key={g.group} label={g.group}>
+                  {g.items.map((c) => <option key={c} value={c}>{c}</option>)}
+                </optgroup>
+              ))}
             </select>
           </div>
 
