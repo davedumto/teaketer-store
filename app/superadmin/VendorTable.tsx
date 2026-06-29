@@ -188,13 +188,17 @@ export default function VendorTable({ initialVendors }: { initialVendors: Vendor
 
       {/* All vendors */}
       <div>
-        <div style={{ ...eyebrow, marginBottom: 12 }}>All Vendors ({vendors.length})</div>
+        <div style={{ ...eyebrow, marginBottom: 12 }}>Approved Vendors ({approved.length})</div>
         <div className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: "1px solid #EBEBEB" }}>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <TableHead />
-              <tbody>{vendors.map((v) => <VendorRow key={v.id} vendor={v} />)}</tbody>
-            </table>
+            {approved.length === 0 ? (
+              <div style={{ padding: "32px", textAlign: "center", color: "#BBB", fontSize: 13 }}>No approved vendors yet.</div>
+            ) : (
+              <table className="w-full text-sm">
+                <TableHead />
+                <tbody>{approved.map((v) => <VendorRow key={v.id} vendor={v} />)}</tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>
