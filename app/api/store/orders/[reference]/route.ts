@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyTransaction, initializeTransaction } from "@/lib/paystack";
 import { markOrderPaid, decrementStock } from "@/lib/commerce";
-import { sendOrderConfirmationEmail } from "@/lib/email";
+import { sendOrderConfirmationEmail, sendVendorOrderEmail } from "@/lib/email";
 import { appUrl } from "@/lib/utils";
 import { after } from "next/server";
 
@@ -33,7 +33,10 @@ export async function GET(
           after(async () => {
             const fresh = await prisma.order.findUnique({
               where: { reference },
-              include: { items: true, vendor: { select: { storeName: true, logoUrl: true } } },
+              include: {
+                items: true,
+                vendor: { select: { email: true, storeName: true, logoUrl: true, storeSlug: true } },
+              },
             });
             if (!fresh) return;
             await decrementStock(fresh.items.map((i) => ({
@@ -44,6 +47,19 @@ export async function GET(
             await sendOrderConfirmationEmail({
               ...fresh,
               vendor: { storeName: fresh.vendor.storeName, logoUrl: fresh.vendor.logoUrl },
+            });
+            await sendVendorOrderEmail({
+              reference: fresh.reference,
+              buyerName: fresh.buyerName,
+              buyerEmail: fresh.buyerEmail,
+              buyerPhone: fresh.buyerPhone,
+              deliveryAddress: fresh.deliveryAddress,
+              deliveryState: fresh.deliveryState,
+              totalAmount: fresh.totalAmount,
+              items: fresh.items,
+              vendorEmail: fresh.vendor.email,
+              storeName: fresh.vendor.storeName,
+              adminOrdersUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://teaketer.com"}/admin/orders`,
             });
           });
         }

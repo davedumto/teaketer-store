@@ -36,11 +36,16 @@ export async function sendVendorRegistrationNotification({
 </body>
 </html>`;
 
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL ?? process.env.SMTP_FROM ?? process.env.SMTP_USER;
+  if (!adminEmail) {
+    console.warn("[email] ADMIN_NOTIFICATION_EMAIL not set — skipping registration notification");
+    return;
+  }
   try {
     const transport = createTransport();
     await transport.sendMail({
       from: `"Teaketer" <${process.env.SMTP_FROM ?? process.env.SMTP_USER}>`,
-      to: "teaketer@gmail.com",
+      to: adminEmail,
       subject: `New store application: ${storeName} by ${vendorName}`,
       html,
     });
