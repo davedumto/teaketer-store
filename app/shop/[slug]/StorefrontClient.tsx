@@ -357,19 +357,38 @@ export default function StorefrontClient({
 
       {/* ── Hero banner (only if bannerUrl set) ── */}
       {vendor.bannerUrl && (
-        <div style={{ position: "relative", height: "clamp(200px, 40vw, 320px)", overflow: "hidden" }}>
+        <div style={{ position: "relative", height: "clamp(220px, 38vw, 340px)", overflow: "hidden" }}>
           <img src={vendor.bannerUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.15) 70%, transparent 100%)" }} />
-          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", padding: "0 20px" }}>
-            <div style={{ maxWidth: "75%" }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.7)", marginBottom: 8 }}>
+          {/* Gradient: strong left fade for text legibility, fades out at 60% */}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.4) 50%, transparent 80%)" }} />
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", padding: "0 clamp(16px, 4vw, 48px)" }}>
+            <div style={{ maxWidth: 520 }}>
+              {/* Store name as eyebrow */}
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: 10 }}>
                 {vendor.storeName}
               </div>
-              <h1 style={{ fontSize: "clamp(1.4rem, 4vw, 3rem)", fontWeight: 800, color: "white", lineHeight: 1.15, letterSpacing: "-0.02em", margin: 0 }}>
-                {vendor.storeDescription || "Shop our collection"}
+              {/* Headline: always short — "Shop our collection" or first sentence only */}
+              <h1 style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)", fontWeight: 800, color: "white", lineHeight: 1.15, letterSpacing: "-0.02em", margin: "0 0 10px" }}>
+                Shop our collection
               </h1>
+              {/* Description: capped at 2 lines, smaller, muted */}
+              {vendor.storeDescription && (
+                <p style={{
+                  fontSize: "clamp(12px, 1.5vw, 14px)",
+                  color: "rgba(255,255,255,0.75)",
+                  lineHeight: 1.55,
+                  margin: "0 0 18px",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                  maxWidth: 420,
+                }}>
+                  {vendor.storeDescription}
+                </p>
+              )}
               <a href="#products"
-                style={{ display: "inline-block", marginTop: 16, padding: "10px 20px", background: "white", color: "#1A1A1A", borderRadius: 6, fontWeight: 700, fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>
+                style={{ display: "inline-block", padding: "10px 22px", background: "white", color: "#1A1A1A", borderRadius: 6, fontWeight: 700, fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>
                 Shop Now
               </a>
             </div>
