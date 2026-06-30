@@ -176,7 +176,7 @@ export default async function HomePage() {
       <div className="tk-editorial" style={{ borderTop: "1px solid #E8E7E3", borderBottom: "1px solid #E8E7E3", background: "white", padding: "40px 40px" }}>
         <div className="tk-editorial-inner" style={{ maxWidth: 1360, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 32, flexWrap: "wrap" }}>
           <p className="tk-serif" style={{ fontSize: "clamp(1.3rem, 2.5vw, 2rem)", fontWeight: 700, fontStyle: "italic", color: "#1A1A1A", margin: 0, lineHeight: 1.3, maxWidth: 560 }}>
-            "Every store here is run by a real Nigerian vendor — not a faceless brand."
+            "Every store here is run by a real Nigerian vendor, not a faceless brand."
           </p>
           <div className="tk-stats-row" style={{ display: "flex", gap: 40 }}>
             {[
