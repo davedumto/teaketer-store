@@ -6,6 +6,22 @@ export default function SuperadminSettings({ initialEmail }: { initialEmail: str
   const [email, setEmail] = useState(initialEmail);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<"idle" | "ok" | "error">("idle");
+  const [backfilling, setBackfilling] = useState(false);
+  const [backfillResult, setBackfillResult] = useState<{ total: number; succeeded: number; failed: number } | null>(null);
+
+  async function runBackfill() {
+    setBackfilling(true);
+    setBackfillResult(null);
+    try {
+      const res = await fetch("/api/superadmin/backfill-subaccounts", { method: "POST" });
+      const data = await res.json();
+      setBackfillResult(data);
+    } catch {
+      setBackfillResult({ total: 0, succeeded: 0, failed: -1 });
+    } finally {
+      setBackfilling(false);
+    }
+  }
 
   async function save() {
     if (!email.trim() || !email.includes("@")) {
@@ -60,6 +76,31 @@ export default function SuperadminSettings({ initialEmail }: { initialEmail: str
           >
             {saving ? "Saving…" : "Save"}
           </button>
+        </div>
+      </div>
+      {/* Backfill Paystack subaccounts */}
+      <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid #F0F0EE" }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#888", marginBottom: 6 }}>
+          Paystack Subaccount Backfill
+        </div>
+        <p style={{ fontSize: 12, color: "#AAA", margin: "0 0 10px" }}>
+          Creates missing Paystack subaccounts for vendors who saved bank details before the fix. Safe to run multiple times — skips vendors already set up.
+        </p>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <button
+            onClick={runBackfill}
+            disabled={backfilling}
+            style={{ padding: "9px 20px", background: backfilling ? "#888" : "#1A1A1A", color: "white", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: backfilling ? "not-allowed" : "pointer", whiteSpace: "nowrap" as const }}
+          >
+            {backfilling ? "Running…" : "Run backfill"}
+          </button>
+          {backfillResult && (
+            <span style={{ fontSize: 12, fontWeight: 600, color: backfillResult.failed > 0 ? "#DC2626" : "#2D6A00" }}>
+              {backfillResult.total === 0
+                ? "✓ All vendors already have subaccounts"
+                : `✓ ${backfillResult.succeeded}/${backfillResult.total} done${backfillResult.failed > 0 ? ` — ${backfillResult.failed} failed (check Paystack account)` : ""}`}
+            </span>
+          )}
         </div>
       </div>
     </div>
