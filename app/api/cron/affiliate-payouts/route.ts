@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { initiateTransfer } from "@/lib/paystack";
+import { sendCronErrorAlert } from "@/lib/email";
 
 export async function GET(req: NextRequest) {
   const secret = req.headers.get("authorization");
@@ -8,6 +9,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  try {
+    return await runPayouts();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[cron] affiliate-payouts fatal error:", message);
+    await sendCronErrorAlert({ cronName: "affiliate-payouts", error: message }).catch(() => {});
+    return NextResponse.json({ error: "Cron failed", detail: message }, { status: 500 });
+  }
+}
+
+async function runPayouts(): Promise<NextResponse> {
   // Find all fulfilled orders with unpaid affiliate commissions
   const pendingOrders = await prisma.order.findMany({
     where: {

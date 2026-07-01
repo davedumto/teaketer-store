@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { formatNaira } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface OrderItem {
   id: string;
@@ -32,6 +33,7 @@ const STATUS_CHIP: Record<string, { bg: string; color: string }> = {
   paid:      { bg: "#EFF6FF", color: "#2563EB" },
   fulfilled: { bg: "#F0FDD4", color: "#2D6A00" },
   cancelled: { bg: "#FEF2F2", color: "#DC2626" },
+  refunded:  { bg: "#F3F4F6", color: "#6B7280" },
 };
 
 function CopyField({ label, value }: { label: string; value: string }) {
@@ -70,6 +72,71 @@ function CopyField({ label, value }: { label: string; value: string }) {
         )}
       </div>
     </div>
+  );
+}
+
+function RefundButton({ orderId, onClose }: { orderId: string; onClose: () => void }) {
+  const router = useRouter();
+  const [confirming, setConfirming] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleRefund() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/vendor/orders/refund", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Refund failed");
+      onClose();
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Refund failed");
+      setLoading(false);
+      setConfirming(false);
+    }
+  }
+
+  if (confirming) {
+    return (
+      <div style={{ marginTop: 24, padding: "16px", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "#DC2626", marginBottom: 12 }}>
+          Refund this order? The buyer will be refunded via Paystack. This cannot be undone.
+        </div>
+        {error && (
+          <div style={{ fontSize: 12, color: "#DC2626", marginBottom: 10 }}>{error}</div>
+        )}
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={() => { setConfirming(false); setError(null); }}
+            disabled={loading}
+            style={{ flex: 1, padding: "9px 0", fontSize: 13, fontWeight: 600, border: "1px solid #EBEBEB", borderRadius: 8, background: "#fff", color: "#555", cursor: "pointer" }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleRefund}
+            disabled={loading}
+            style={{ flex: 1, padding: "9px 0", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 8, background: "#DC2626", color: "#fff", cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1 }}
+          >
+            {loading ? "Refunding…" : "Yes, refund"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => setConfirming(true)}
+      style={{ marginTop: 24, width: "100%", padding: "11px 0", fontSize: 13, fontWeight: 700, border: "1px solid #FECACA", borderRadius: 10, background: "#FEF2F2", color: "#DC2626", cursor: "pointer" }}
+    >
+      Refund order
+    </button>
   );
 }
 
@@ -192,6 +259,10 @@ export default function OrderDetailDrawer({
             )}
             <CopyField label="Date" value={new Date(order.createdAt).toLocaleString("en-NG")} />
           </div>
+
+          {order.status === "paid" && (
+            <RefundButton orderId={order.id} onClose={onClose} />
+          )}
         </div>
       </div>
     </>

@@ -19,6 +19,7 @@ const STATUS_CHIP: Record<string, { bg: string; color: string }> = {
   paid:      { bg: "#EFF6FF", color: "#2563EB" },
   fulfilled: { bg: "#F0FDD4", color: "#2D6A00" },
   cancelled: { bg: "#FEF2F2", color: "#DC2626" },
+  refunded:  { bg: "#F3F4F6", color: "#6B7280" },
 };
 
 export default async function DashboardPage() {

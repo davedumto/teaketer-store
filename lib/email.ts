@@ -279,6 +279,53 @@ export async function sendVendorOrderEmail(data: VendorOrderEmailData): Promise<
   }
 }
 
+export async function sendCronErrorAlert({
+  cronName,
+  error,
+}: { cronName: string; error: string }): Promise<void> {
+  const adminEmail =
+    (await getSiteSetting("admin_notification_email")) ??
+    process.env.ADMIN_NOTIFICATION_EMAIL ??
+    process.env.SMTP_FROM ??
+    process.env.SMTP_USER;
+  if (!adminEmail) return;
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="background:#0a0a0a;color:#f7efe2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;padding:0;">
+  <div style="max-width:520px;margin:0 auto;padding:48px 16px;">
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#ff6a2b;margin-bottom:6px;">Teaketer Store — Cron Alert</div>
+      <div style="font-size:22px;font-weight:700;color:#f7efe2;">⚠️ Cron job failed</div>
+    </div>
+    <div style="background:rgba(255,106,43,0.08);border:1px solid rgba(255,106,43,0.3);border-radius:16px;padding:24px;margin-bottom:16px;">
+      <div style="font-size:12px;color:rgba(247,239,226,0.5);margin-bottom:4px;">Job</div>
+      <div style="font-size:15px;font-weight:700;font-family:monospace;color:#ff6a2b;margin-bottom:16px;">${cronName}</div>
+      <div style="font-size:12px;color:rgba(247,239,226,0.5);margin-bottom:4px;">Error</div>
+      <div style="font-size:13px;font-family:monospace;color:#f7efe2;white-space:pre-wrap;word-break:break-all;">${error}</div>
+    </div>
+    <div style="text-align:center;font-size:12px;color:rgba(247,239,226,0.3);margin-top:24px;">
+      Check Vercel logs for the full stack trace.
+    </div>
+  </div>
+</body>
+</html>`;
+
+  try {
+    const transport = createTransport();
+    await transport.sendMail({
+      from: `"Teaketer Alerts" <${process.env.SMTP_FROM ?? process.env.SMTP_USER}>`,
+      to: adminEmail,
+      subject: `[ALERT] Cron ${cronName} failed`,
+      html,
+    });
+  } catch (err) {
+    console.error("[email] cron alert failed:", err);
+  }
+}
+
 export async function sendTrackingEmail({
   email, storeName, link,
 }: { email: string; storeName: string; link: string }): Promise<void> {

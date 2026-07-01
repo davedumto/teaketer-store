@@ -190,6 +190,22 @@ export async function initiateTransfer(params: {
   return { transferCode: json.data.transfer_code, status: json.data.status };
 }
 
+export async function refundTransaction(params: {
+  transactionReference: string;
+  amountKobo?: number;
+}): Promise<{ refundId: number; status: string }> {
+  const body: Record<string, unknown> = { transaction: params.transactionReference };
+  if (params.amountKobo !== undefined) body.amount = params.amountKobo;
+  const res = await fetch(`${PAYSTACK_BASE}/refund`, {
+    method: "POST",
+    headers: headers(),
+    body: JSON.stringify(body),
+  });
+  const json = await res.json();
+  if (!json.status) throw new Error(`Paystack refund failed: ${json.message}`);
+  return { refundId: json.data.id, status: json.data.status };
+}
+
 export async function getBanks(): Promise<{ name: string; code: string }[]> {
   const res = await fetch(`${PAYSTACK_BASE}/bank?country=nigeria&perPage=100`, {
     headers: { Authorization: `Bearer ${secretKey()}` },
