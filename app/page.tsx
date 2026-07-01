@@ -126,9 +126,9 @@ export default async function HomePage() {
           </div>
 
           <div className="tk-three-col" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
-            {vendors.map((vendor, idx) => (
+            {vendors.map((vendor) => (
               <Link key={vendor.id} href={`/shop/${vendor.storeSlug}`} style={{ textDecoration: "none" }}>
-                <div className="tk-store-card" style={{ position: "relative", borderRadius: 20, overflow: "hidden", background: "#F5F5F2", aspectRatio: idx === 0 ? "3/4" : "1/1.1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 24px 24px" }}>
+                <div className="tk-store-card" style={{ position: "relative", borderRadius: 20, overflow: "hidden", background: "#F5F5F2", aspectRatio: "3/4", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 24px 24px" }}>
 
                   {/* Blurred banner as background tint */}
                   {vendor.bannerUrl && (
@@ -146,7 +146,7 @@ export default async function HomePage() {
                   <div style={{ position: "relative", zIndex: 1, marginBottom: 20 }}>
                     {vendor.logoUrl
                       ? <img src={vendor.logoUrl} alt={vendor.storeName} className="tk-store-img" style={{ width: 96, height: 96, borderRadius: 22, objectFit: "cover", boxShadow: "0 8px 32px rgba(0,0,0,0.12)", border: "3px solid white" }} />
-                      : <div style={{ width: 96, height: 96, borderRadius: 22, background: `hsl(${(idx * 47) % 360}, 20%, 82%)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 900, color: "white", boxShadow: "0 8px 32px rgba(0,0,0,0.10)" }}>
+                      : <div style={{ width: 96, height: 96, borderRadius: 22, background: `hsl(${vendor.id.charCodeAt(0) * 47 % 360}, 20%, 82%)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 900, color: "white", boxShadow: "0 8px 32px rgba(0,0,0,0.10)" }}>
                           {vendor.storeName.slice(0, 2).toUpperCase()}
                         </div>
                     }
@@ -169,6 +169,15 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
+
+          {vendors.length >= 12 && (
+            <div style={{ textAlign: "center", marginTop: 40 }}>
+              <Link href="/search" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#1A1A1A", textDecoration: "none", borderBottom: "2px solid #C4F23A", paddingBottom: 2 }}>
+                View all stores
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </Link>
+            </div>
+          )}
         </section>
       )}
 

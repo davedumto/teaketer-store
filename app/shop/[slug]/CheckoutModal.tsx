@@ -50,13 +50,17 @@ export default function CheckoutModal({
   const [codeInput, setCodeInput] = useState("");
   const [codeState, setCodeState] = useState<"idle" | "checking" | "ok" | "invalid">("idle");
   const [deliveryZones, setDeliveryZones] = useState<{ state: string; feeKobo: number }[]>([]);
+  const [zonesLoaded, setZonesLoaded] = useState(false);
+  const [zonesError, setZonesError] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
+    setZonesLoaded(false);
+    setZonesError(false);
     fetch(`/api/store/delivery-zones?slug=${encodeURIComponent(storeSlug)}`)
-      .then((r) => r.json())
-      .then((d) => setDeliveryZones(d.zones ?? []))
-      .catch(() => {});
+      .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((d) => { setDeliveryZones(d.zones ?? []); setZonesLoaded(true); })
+      .catch(() => { setZonesError(true); setZonesLoaded(true); });
   }, [isOpen, storeSlug]);
 
   function set(field: string) {
@@ -65,7 +69,9 @@ export default function CheckoutModal({
   }
 
   const hasAnyZones = deliveryZones.length > 0;
-  const deliveryFee = !form.state
+  const deliveryFee = zonesError
+    ? -2  // -2 = could not load zones; block checkout
+    : !form.state
     ? null
     : !hasAnyZones
     ? 0  // vendor hasn't configured zones — treat as free (no delivery restriction)
@@ -86,11 +92,12 @@ export default function CheckoutModal({
 
   const subtotal = cart.reduce((s, i) => s + i.priceKobo * i.quantity, 0);
   const stateNotServed = deliveryFee === -1;
+  const zonesLoadError = deliveryFee === -2;
   const total = subtotal + (deliveryFee !== null && deliveryFee >= 0 ? deliveryFee : 0);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (stateNotServed) return;
+    if (stateNotServed || zonesLoadError) return;
     setError("");
     setLoading(true);
     try {
@@ -154,14 +161,21 @@ export default function CheckoutModal({
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
               <span style={{ color: "#666" }}>Delivery</span>
-              <span style={{ fontWeight: 600, color: stateNotServed ? "#DC2626" : deliveryFee === null ? "#BBB" : deliveryFee === 0 ? "#2D6A00" : "#1A1A1A" }}>
-                {stateNotServed
+              <span style={{ fontWeight: 600, color: zonesLoadError ? "#DC2626" : stateNotServed ? "#DC2626" : deliveryFee === null ? "#BBB" : deliveryFee === 0 ? "#2D6A00" : "#1A1A1A" }}>
+                {zonesLoadError
+                  ? "Unavailable"
+                  : stateNotServed
                   ? "Not available to this state"
                   : deliveryFee === null
                   ? "Select a state"
                   : deliveryFee === 0 ? "Free" : formatNaira(deliveryFee)}
               </span>
             </div>
+            {zonesLoadError && (
+              <p style={{ margin: "2px 0 0", fontSize: 11, color: "#DC2626" }}>
+                Could not load delivery fees. Please refresh and try again.
+              </p>
+            )}
             {stateNotServed && (
               <p style={{ margin: "2px 0 0", fontSize: 11, color: "#DC2626" }}>
                 This store doesn&apos;t deliver to {form.state}. Please select a different state or contact the vendor.
@@ -250,9 +264,9 @@ export default function CheckoutModal({
             </div>
           )}
 
-          <button type="submit" disabled={loading || stateNotServed}
-            style={{ width: "100%", padding: "14px", background: loading || stateNotServed ? "#888" : "#1A1A1A", color: "white", border: "none", borderRadius: 8, cursor: loading || stateNotServed ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", marginTop: 4 }}>
-            {loading ? "Processing…" : stateNotServed ? "Delivery not available" : `Pay ${formatNaira(total)} via Paystack`}
+          <button type="submit" disabled={loading || stateNotServed || zonesLoadError}
+            style={{ width: "100%", padding: "14px", background: loading || stateNotServed || zonesLoadError ? "#888" : "#1A1A1A", color: "white", border: "none", borderRadius: 8, cursor: loading || stateNotServed || zonesLoadError ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", marginTop: 4 }}>
+            {loading ? "Processing…" : stateNotServed ? "Delivery not available" : zonesLoadError ? "Reload to continue" : `Pay ${formatNaira(total)} via Paystack`}
           </button>
           <p style={{ textAlign: "center", fontSize: 11, color: "#BBB", margin: 0 }}>Payments are secured by Paystack</p>
         </form>

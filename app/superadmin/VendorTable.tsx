@@ -71,7 +71,15 @@ export default function VendorTable({ initialVendors }: { initialVendors: Vendor
       <tr style={{ borderBottom: "1px solid #EBEBEB" }}>
         <td className="px-4 py-3.5">
           <div className="font-semibold text-sm" style={{ color: "#1A1A1A" }}>{vendor.storeName}</div>
-          <div className="text-xs mt-0.5 font-mono" style={{ color: "#888" }}>/shop/{vendor.storeSlug}</div>
+          <a
+            href={`/shop/${vendor.storeSlug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs mt-0.5 font-mono inline-block"
+            style={{ color: "#2D6A00", textDecoration: "underline" }}
+          >
+            /shop/{vendor.storeSlug}
+          </a>
           {vendor.businessPageUrl && (
             <a
               href={vendor.businessPageUrl}

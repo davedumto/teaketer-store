@@ -5,6 +5,7 @@ import { markOrderPaid, decrementStock } from "@/lib/commerce";
 import { sendOrderConfirmationEmail, sendVendorOrderEmail } from "@/lib/email";
 import { appUrl } from "@/lib/utils";
 import { after } from "next/server";
+import { getPusherServer, storeChannel, vendorChannel, EVENTS } from "@/lib/pusher";
 
 export async function GET(
   req: NextRequest,
@@ -35,15 +36,27 @@ export async function GET(
               where: { reference },
               include: {
                 items: true,
-                vendor: { select: { email: true, storeName: true, logoUrl: true, storeSlug: true } },
+                vendor: { select: { id: true, email: true, storeName: true, logoUrl: true, storeSlug: true } },
               },
             });
             if (!fresh) return;
-            await decrementStock(fresh.items.map((i) => ({
+            const stockUpdates = await decrementStock(fresh.items.map((i) => ({
               variantId: i.variantId,
               productId: i.productId,
               quantity: i.quantity,
             })));
+
+            const pusher = getPusherServer();
+            for (const update of stockUpdates) {
+              await pusher.trigger(storeChannel(fresh.vendor.storeSlug), EVENTS.STOCK_UPDATED, update);
+            }
+            await pusher.trigger(vendorChannel(fresh.vendor.id), EVENTS.ORDER_PAID, {
+              orderId: fresh.id,
+              reference: fresh.reference,
+              totalAmount: fresh.totalAmount,
+              buyerName: fresh.buyerName,
+            });
+
             await sendOrderConfirmationEmail({
               ...fresh,
               vendor: { storeName: fresh.vendor.storeName, logoUrl: fresh.vendor.logoUrl },
