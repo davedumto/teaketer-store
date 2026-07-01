@@ -128,7 +128,7 @@ export default async function HomePage() {
           <div className="tk-three-col" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
             {vendors.map((vendor) => (
               <Link key={vendor.id} href={`/shop/${vendor.storeSlug}`} style={{ textDecoration: "none" }}>
-                <div className="tk-store-card" style={{ position: "relative", borderRadius: 20, overflow: "hidden", background: vendor.bannerUrl ? "#F5F5F2" : `hsl(${vendor.id.charCodeAt(0) * 47 % 360}, 14%, 90%)`, border: vendor.bannerUrl ? "none" : "1px solid rgba(0,0,0,0.07)", aspectRatio: "3/4", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 24px 24px" }}>
+                <div className="tk-store-card" style={{ position: "relative", borderRadius: 20, overflow: "hidden", background: vendor.bannerUrl ? "#F5F5F2" : `hsl(${vendor.id.split("").reduce((a, c) => a + c.charCodeAt(0), 0) % 360}, 18%, 88%)`, border: vendor.bannerUrl ? "none" : "1px solid rgba(0,0,0,0.07)", aspectRatio: "3/4", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 24px 24px" }}>
 
                   {/* Blurred banner as background tint */}
                   {vendor.bannerUrl && (

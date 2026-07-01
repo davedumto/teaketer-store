@@ -63,22 +63,22 @@ export default async function DashboardPage() {
           </h1>
           <ShareStoreButton storeUrl={`${process.env.NEXT_PUBLIC_APP_URL ?? ""}/shop/${vendor.storeSlug}`} />
         </div>
-        {!vendorRow?.isApproved && (
+        {vendorRow && !vendorRow.isApproved && (
           <div className="inline-flex items-center gap-2 mt-3 rounded-2xl px-4 py-2 text-sm" style={{
             background: "#FEF9EC", border: "1px solid #D97706", color: "#D97706",
           }}>
             ⏳ Pending approval — your store will be visible once reviewed by Teaketer.
           </div>
         )}
-        {(!vendorRow?.logoUrl || !vendorRow?.bannerUrl) && (
+        {vendorRow && (!vendorRow.logoUrl || !vendorRow.bannerUrl) && (
           <Link href="/admin/settings" style={{ textDecoration: "none" }}>
             <div className="inline-flex items-center gap-2 mt-3 rounded-2xl px-4 py-2 text-sm" style={{
               background: "#FFF4EC", border: "1px solid #FB923C", color: "#C2410C", cursor: "pointer",
             }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-              {!vendorRow?.logoUrl && !vendorRow?.bannerUrl
+              {!vendorRow.logoUrl && !vendorRow.bannerUrl
                 ? "Your store is missing a logo and banner — add them in Settings to make your store stand out."
-                : !vendorRow?.logoUrl
+                : !vendorRow.logoUrl
                   ? "Your store is missing a logo — add one in Settings."
                   : "Your store is missing a banner image — add one in Settings."}
               <span style={{ fontWeight: 700, marginLeft: 4 }}>Go to Settings →</span>
