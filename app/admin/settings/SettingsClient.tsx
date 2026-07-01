@@ -16,6 +16,7 @@ interface VendorData {
   bankName: string | null;
   accountNumber: string | null;
   accountName: string | null;
+  paystackSubaccountCode: string | null;
   isApproved: boolean;
   socialInstagram: string;
   socialFacebook: string;
@@ -397,8 +398,10 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
         <SectionHeader label="Payout Bank Account" />
         {vendor.accountName && (
           <div className="rounded-2xl px-4 py-3 mb-4 text-sm"
-            style={{ background: "#F0FDD4", border: "1px solid #C4F23A", color: "#2D6A00" }}>
-            ✓ Linked: {vendor.accountName} — {vendor.bankName} ****{vendor.accountNumber?.slice(-4)}
+            style={{ background: vendor.paystackSubaccountCode ? "#F0FDD4" : "#FFF9E6", border: `1px solid ${vendor.paystackSubaccountCode ? "#C4F23A" : "#F5C518"}`, color: vendor.paystackSubaccountCode ? "#2D6A00" : "#7A5700" }}>
+            {vendor.paystackSubaccountCode
+              ? `✓ Linked & Paystack ready: ${vendor.accountName} — ${vendor.bankName} ****${vendor.accountNumber?.slice(-4)}`
+              : `⚠ Account saved but Paystack subaccount not created yet — re-save your bank details to activate payouts. ${vendor.accountName} — ${vendor.bankName} ****${vendor.accountNumber?.slice(-4)}`}
           </div>
         )}
         <div className="space-y-4">

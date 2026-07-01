@@ -24,6 +24,7 @@ export default async function SettingsPage() {
       bankName: true,
       accountNumber: true,
       accountName: true,
+      paystackSubaccountCode: true,
       isApproved: true,
       socialInstagram: true,
       socialFacebook: true,

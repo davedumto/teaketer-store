@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getVendorFromRequest, signVendorJwt, setVendorCookie } from "@/lib/vendorAuth";
-import { resolveAccountName } from "@/lib/paystack";
+import { resolveAccountName, createSubaccount } from "@/lib/paystack";
 import bcrypt from "bcryptjs";
 
 export async function PATCH(req: NextRequest) {
@@ -40,21 +40,48 @@ export async function PATCH(req: NextRequest) {
   if (typeof patch.socialFacebook === "string")  updateData.socialFacebook  = patch.socialFacebook.trim();
   if (typeof patch.socialWhatsapp === "string")  updateData.socialWhatsapp  = patch.socialWhatsapp.trim();
 
-  // Bank details update — resolve account name first
+  // Bank details update — resolve account name then create/update Paystack subaccount
   if (typeof patch.accountNumber === "string" && typeof patch.bankCode === "string" && typeof patch.bankName === "string") {
+    const accountNumber = patch.accountNumber.trim();
+    const bankCode = patch.bankCode.trim();
+    const bankName = patch.bankName.trim();
+
+    let accountName: string;
     try {
-      const { accountName } = await resolveAccountName({
-        accountNumber: patch.accountNumber,
-        bankCode: patch.bankCode,
-      });
-      updateData.accountNumber = patch.accountNumber;
-      updateData.bankCode = patch.bankCode;
-      updateData.bankName = patch.bankName;
-      updateData.accountName = accountName;
+      const resolved = await resolveAccountName({ accountNumber, bankCode });
+      accountName = resolved.accountName;
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Could not resolve account";
       return NextResponse.json({ error: msg }, { status: 422 });
     }
+
+    // Fetch current vendor to check if subaccount already exists
+    const currentVendor = await prisma.vendor.findUnique({
+      where: { id: vendor.id },
+      select: { storeName: true, email: true, paystackSubaccountCode: true, platformFeeBps: true },
+    });
+
+    // Only create a new subaccount if the bank details changed or one doesn't exist yet
+    if (!currentVendor?.paystackSubaccountCode) {
+      try {
+        const { subaccountCode } = await createSubaccount({
+          businessName: currentVendor?.storeName ?? accountName,
+          bankCode,
+          accountNumber,
+          platformFeePercent: (currentVendor?.platformFeeBps ?? 500) / 100,
+          email: currentVendor?.email,
+        });
+        updateData.paystackSubaccountCode = subaccountCode;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Could not create Paystack subaccount";
+        return NextResponse.json({ error: msg }, { status: 502 });
+      }
+    }
+
+    updateData.accountNumber = accountNumber;
+    updateData.bankCode = bankCode;
+    updateData.bankName = bankName;
+    updateData.accountName = accountName;
   }
 
   // Password change
@@ -79,6 +106,7 @@ export async function PATCH(req: NextRequest) {
       id: true, name: true, email: true, storeName: true, storeSlug: true,
       storeDescription: true, logoUrl: true, bannerUrl: true, isApproved: true,
       allowPublicAffiliate: true, bankCode: true, bankName: true, accountNumber: true, accountName: true,
+      paystackSubaccountCode: true,
     },
   });
 
