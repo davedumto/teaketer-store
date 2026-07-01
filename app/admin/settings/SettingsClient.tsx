@@ -276,16 +276,16 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
           </div>
 
           {/* Logo + Banner side by side */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-1" style={{ borderTop: "1px solid #EBEBEB" }}>
+          <div data-tour="settings-images" className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-1" style={{ borderTop: "1px solid #EBEBEB" }}>
             <ImageUploadField
               label="Store Logo"
-              hint="Square image, shown on your storefront and marketplace"
+              hint="Square · min 400×400 px · JPG or PNG under 5 MB"
               value={form.logoUrl}
               onChange={(url) => setForm((f) => ({ ...f, logoUrl: url }))}
             />
             <ImageUploadField
               label="Banner Image"
-              hint="Wide image displayed at the top of your store page"
+              hint="Landscape · min 1200×400 px · JPG or PNG under 5 MB"
               value={form.bannerUrl}
               onChange={(url) => setForm((f) => ({ ...f, bannerUrl: url }))}
             />
@@ -313,7 +313,7 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
       </div>
 
       {/* Commission structure */}
-      <div className="rounded-3xl p-6" style={{ background: "#fff", border: "1px solid #EBEBEB" }}>
+      <div data-tour="settings-commission" className="rounded-3xl p-6" style={{ background: "#fff", border: "1px solid #EBEBEB" }}>
         <SectionHeader label="Affiliate Commission Rate" />
 
         {/* Platform fee — read only */}
@@ -353,7 +353,7 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
       </div>
 
       {/* Delivery fees */}
-      <div className="rounded-3xl p-6" style={{ background: "#fff", border: "1px solid #EBEBEB" }}>
+      <div data-tour="settings-delivery" className="rounded-3xl p-6" style={{ background: "#fff", border: "1px solid #EBEBEB" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <SectionHeader label="Delivery Fees by State" />
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -394,7 +394,7 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
       </div>
 
       {/* Bank details */}
-      <div className="rounded-3xl p-6" style={{ background: "#fff", border: "1px solid #EBEBEB" }}>
+      <div data-tour="settings-bank" className="rounded-3xl p-6" style={{ background: "#fff", border: "1px solid #EBEBEB" }}>
         <SectionHeader label="Payout Bank Account" />
         {vendor.accountName && (
           <div className="rounded-2xl px-4 py-3 mb-4 text-sm"

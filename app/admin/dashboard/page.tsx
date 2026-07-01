@@ -69,7 +69,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div data-tour="dashboard-stats" className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {statCards.map((s) => (
           <div key={s.label} className="rounded-3xl p-5" style={{ background: s.accent.bg, color: s.accent.ink, minHeight: 130 }}>
             <div className="eyebrow mb-3" style={{ color: s.accent.ink === "#0a0a0a" ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.55)", fontSize: 9 }}>
@@ -99,7 +99,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Recent orders */}
-      <div className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: "1px solid #EBEBEB" }}>
+      <div data-tour="dashboard-recent" className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: "1px solid #EBEBEB" }}>
         <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid #EBEBEB" }}>
           <div className="eyebrow" style={{ color: "#999", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>Recent Orders</div>
           <Link href="/admin/orders" className="text-xs font-semibold hover:underline" style={{ color: "#1A1A1A" }}>

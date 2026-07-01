@@ -1,25 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import type { VendorPayload } from "@/lib/vendorAuth";
+import OnboardingTour from "./OnboardingTour";
 
 const NAV = [
-  { href: "/admin/dashboard", label: "Dashboard" },
-  { href: "/admin/products", label: "Products" },
-  { href: "/admin/orders", label: "Orders" },
-  { href: "/admin/affiliates", label: "Affiliates" },
-  { href: "/admin/settings", label: "Settings" },
+  { href: "/admin/dashboard",  label: "Dashboard",  tour: undefined },
+  { href: "/admin/products",   label: "Products",   tour: "nav-products" },
+  { href: "/admin/orders",     label: "Orders",     tour: "nav-orders" },
+  { href: "/admin/affiliates", label: "Affiliates", tour: "nav-affiliates" },
+  { href: "/admin/settings",   label: "Settings",   tour: "nav-settings" },
 ];
 
 export default function AdminSidebar({ vendor }: { vendor: VendorPayload }) {
   const pathname = usePathname();
-  const router = useRouter();
 
   async function logout() {
     await fetch("/api/vendor/auth/login", { method: "DELETE" });
-    router.replace("/admin/login");
+    window.location.href = "/admin/login";
   }
 
   return (
@@ -47,11 +47,12 @@ export default function AdminSidebar({ vendor }: { vendor: VendorPayload }) {
       </div>
 
       {/* ── Mobile bottom nav — hidden on desktop ── */}
-      <nav className="admin-mobile-bottom" style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50, background: "white", borderTop: "1px solid #EBEBEB", justifyContent: "space-around", padding: "8px 0 12px" }}>
+      <nav className="admin-mobile-bottom" style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 9003, background: "white", borderTop: "1px solid #EBEBEB", justifyContent: "space-around", padding: "8px 0 12px" }}>
         {NAV.map((n) => {
           const on = pathname?.startsWith(n.href);
           return (
             <Link key={n.href} href={n.href}
+              {...(n.tour ? { "data-tour": n.tour } : {})}
               style={{ display: "flex", flexDirection: "column", alignItems: "center", fontSize: 10, fontWeight: on ? 700 : 500, color: on ? "#1A1A1A" : "#BBB", textDecoration: "none", padding: "2px 8px" }}>
               {n.label}
             </Link>
@@ -75,6 +76,7 @@ export default function AdminSidebar({ vendor }: { vendor: VendorPayload }) {
             const on = pathname?.startsWith(n.href);
             return (
               <Link key={n.href} href={n.href}
+                {...(n.tour ? { "data-tour": n.tour } : {})}
                 style={{
                   display: "flex", alignItems: "center", padding: "10px 14px", borderRadius: 8,
                   marginBottom: 2, textDecoration: "none", fontSize: 13,
@@ -95,6 +97,12 @@ export default function AdminSidebar({ vendor }: { vendor: VendorPayload }) {
             <div style={{ fontWeight: 700, fontSize: 13, color: "#1A1A1A", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{vendor.storeName}</div>
             <div style={{ fontSize: 11, color: "#999", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{vendor.email}</div>
           </div>
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent("tk:start-tour"))}
+            style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "9px 14px", borderRadius: 8, fontSize: 13, fontWeight: 500, color: "#888", background: "transparent", border: "none", cursor: "pointer", marginBottom: 2 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            Take the tour
+          </button>
           <button onClick={logout}
             style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "9px 14px", borderRadius: 8, fontSize: 13, fontWeight: 500, color: "#888", background: "transparent", border: "none", cursor: "pointer" }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -102,6 +110,8 @@ export default function AdminSidebar({ vendor }: { vendor: VendorPayload }) {
           </button>
         </div>
       </aside>
+
+      <OnboardingTour pathname={pathname ?? ""} />
     </>
   );
 }
