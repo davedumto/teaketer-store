@@ -33,12 +33,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Refund already in progress or order is no longer paid." }, { status: 409 });
   }
 
+  let refundId: number;
+  let refundStatus: string;
+
   try {
-    const { refundId, status } = await refundTransaction({ transactionReference: order.reference });
-    await prisma.order.update({ where: { id: order.id }, data: { status: "refunded" } });
-    return NextResponse.json({ refundId, status });
+    const result = await refundTransaction({ transactionReference: order.reference });
+    refundId = result.refundId;
+    refundStatus = result.status;
   } catch (err) {
-    // Paystack call failed — roll back to "paid" so vendor can retry
+    // Paystack rejected the refund — safe to roll back, money never moved
     try {
       await prisma.order.update({ where: { id: order.id }, data: { status: "paid" } });
     } catch (rollbackErr) {
@@ -47,4 +50,14 @@ export async function POST(req: NextRequest) {
     const message = err instanceof Error ? err.message : "Refund failed";
     return NextResponse.json({ error: message }, { status: 502 });
   }
+
+  // Paystack refund issued — persist final status regardless of DB errors
+  try {
+    await prisma.order.update({ where: { id: order.id }, data: { status: "refunded" } });
+  } catch (dbErr) {
+    console.error("[refund] DB update to 'refunded' failed after Paystack success. RefundId:", refundId, dbErr);
+    // Do NOT roll back — Paystack already issued the refund
+  }
+
+  return NextResponse.json({ refundId, status: refundStatus });
 }
