@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getVendorFromRequest, signVendorJwt, setVendorCookie } from "@/lib/vendorAuth";
-import { resolveAccountName, createSubaccount } from "@/lib/paystack";
+import { resolveAccountName, createSubaccount, updateSubaccount } from "@/lib/paystack";
 import bcrypt from "bcryptjs";
 
 export async function PATCH(req: NextRequest) {
@@ -61,8 +61,20 @@ export async function PATCH(req: NextRequest) {
       select: { storeName: true, email: true, paystackSubaccountCode: true, platformFeeBps: true },
     });
 
-    // Only create a new subaccount if the bank details changed or one doesn't exist yet
-    if (!currentVendor?.paystackSubaccountCode) {
+    if (currentVendor?.paystackSubaccountCode) {
+      // Subaccount exists — update bank details on Paystack
+      try {
+        await updateSubaccount({
+          subaccountCode: currentVendor.paystackSubaccountCode,
+          bankCode,
+          accountNumber,
+        });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Could not update Paystack subaccount";
+        return NextResponse.json({ error: msg }, { status: 502 });
+      }
+    } else {
+      // No subaccount yet — create one
       try {
         const { subaccountCode } = await createSubaccount({
           businessName: currentVendor?.storeName ?? accountName,

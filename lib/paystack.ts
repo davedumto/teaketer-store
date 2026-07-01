@@ -112,6 +112,23 @@ export async function createSubaccount(params: {
   };
 }
 
+export async function updateSubaccount(params: {
+  subaccountCode: string;
+  bankCode: string;
+  accountNumber: string;
+}): Promise<void> {
+  const res = await fetch(`${PAYSTACK_BASE}/subaccount/${params.subaccountCode}`, {
+    method: "PUT",
+    headers: headers(),
+    body: JSON.stringify({
+      settlement_bank: params.bankCode,
+      account_number: params.accountNumber,
+    }),
+  });
+  const json = await res.json();
+  if (!json.status) throw new Error(`Paystack subaccount update failed: ${json.message}`);
+}
+
 export async function resolveAccountName(params: {
   accountNumber: string;
   bankCode: string;

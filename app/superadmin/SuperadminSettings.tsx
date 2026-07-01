@@ -17,7 +17,7 @@ export default function SuperadminSettings({ initialEmail }: { initialEmail: str
       const data = await res.json();
       setBackfillResult(data);
     } catch {
-      setBackfillResult({ total: 0, succeeded: 0, failed: -1 });
+      setBackfillResult({ total: -1, succeeded: 0, failed: -1 });
     } finally {
       setBackfilling(false);
     }
@@ -95,10 +95,14 @@ export default function SuperadminSettings({ initialEmail }: { initialEmail: str
             {backfilling ? "Running…" : "Run backfill"}
           </button>
           {backfillResult && (
-            <span style={{ fontSize: 12, fontWeight: 600, color: backfillResult.failed > 0 ? "#DC2626" : "#2D6A00" }}>
-              {backfillResult.total === 0
+            <span style={{ fontSize: 12, fontWeight: 600, color: backfillResult.failed !== 0 ? "#DC2626" : "#2D6A00" }}>
+              {backfillResult.total === -1
+                ? "Network error — backfill did not run"
+                : backfillResult.total === 0
                 ? "✓ All vendors already have subaccounts"
-                : `✓ ${backfillResult.succeeded}/${backfillResult.total} done${backfillResult.failed > 0 ? ` — ${backfillResult.failed} failed (check Paystack account)` : ""}`}
+                : backfillResult.failed === 0
+                ? `✓ ${backfillResult.succeeded}/${backfillResult.total} subaccounts created`
+                : `${backfillResult.succeeded}/${backfillResult.total} done — ${backfillResult.failed} failed (check Paystack account)`}
             </span>
           )}
         </div>
