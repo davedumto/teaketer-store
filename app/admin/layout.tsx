@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getVendorFromCookies } from "@/lib/vendorAuth";
 import AdminSidebar from "@/components/AdminSidebar";
 
