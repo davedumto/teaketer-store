@@ -24,12 +24,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { refundId, status } = await refundTransaction({ transactionReference: order.reference });
-
-  await prisma.order.update({
-    where: { id: order.id },
-    data: { status: "refunded" },
+  // Atomic claim: only succeeds if the order is still "paid", preventing double-refund
+  const claimed = await prisma.order.updateMany({
+    where: { id: order.id, status: "paid" },
+    data: { status: "refunding" },
   });
+  if (claimed.count === 0) {
+    return NextResponse.json({ error: "Refund already in progress or order is no longer paid." }, { status: 409 });
+  }
 
-  return NextResponse.json({ refundId, status });
+  try {
+    const { refundId, status } = await refundTransaction({ transactionReference: order.reference });
+    await prisma.order.update({ where: { id: order.id }, data: { status: "refunded" } });
+    return NextResponse.json({ refundId, status });
+  } catch (err) {
+    // Paystack call failed — roll back to "paid" so vendor can retry
+    await prisma.order.update({ where: { id: order.id }, data: { status: "paid" } });
+    const message = err instanceof Error ? err.message : "Refund failed";
+    return NextResponse.json({ error: message }, { status: 502 });
+  }
 }

@@ -11,6 +11,7 @@ const STATUS_CHIP: Record<string, { bg: string; color: string }> = {
   fulfilled: { bg: "#F0FDD4", color: "#2D6A00" },
   cancelled: { bg: "#FEF2F2", color: "#DC2626" },
   refunded:  { bg: "#F3F4F6", color: "#6B7280" },
+  refunding: { bg: "#FEF9EC", color: "#D97706" },
 };
 
 export default function OrdersTable({ orders }: { orders: OrderDetail[] }) {
