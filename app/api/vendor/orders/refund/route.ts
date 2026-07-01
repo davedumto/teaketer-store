@@ -39,7 +39,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ refundId, status });
   } catch (err) {
     // Paystack call failed — roll back to "paid" so vendor can retry
-    await prisma.order.update({ where: { id: order.id }, data: { status: "paid" } });
+    try {
+      await prisma.order.update({ where: { id: order.id }, data: { status: "paid" } });
+    } catch (rollbackErr) {
+      console.error("[refund] rollback failed, order stuck in 'refunding':", rollbackErr);
+    }
     const message = err instanceof Error ? err.message : "Refund failed";
     return NextResponse.json({ error: message }, { status: 502 });
   }

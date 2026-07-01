@@ -98,7 +98,7 @@ function RefundButton({ orderId, onClose }: { orderId: string; onClose: () => vo
     } catch (err) {
       setError(err instanceof Error ? err.message : "Refund failed");
       setLoading(false);
-      setConfirming(false);
+      // keep confirming:true so the error message stays visible
     }
   }
 
