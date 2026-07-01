@@ -5,6 +5,7 @@ import { getVendorFromCookies } from "@/lib/vendorAuth";
 import { prisma } from "@/lib/prisma";
 import { formatNaira } from "@/lib/utils";
 import Link from "next/link";
+import ShareStoreButton from "./ShareStoreButton";
 
 const ACCENT_CARDS = [
   { bg: "#c4f23a", ink: "#0a0a0a" },
@@ -56,9 +57,12 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="mb-8">
         <div className="eyebrow mb-2" style={{ color: "#999", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>Store Dashboard</div>
-        <h1 className="font-display" style={{ color: "#1A1A1A", fontSize: "clamp(1.6rem,3vw,2.2rem)" }}>
-          {vendor.storeName}
-        </h1>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+          <h1 className="font-display" style={{ color: "#1A1A1A", fontSize: "clamp(1.6rem,3vw,2.2rem)", margin: 0 }}>
+            {vendor.storeName}
+          </h1>
+          <ShareStoreButton storeUrl={`${process.env.NEXT_PUBLIC_APP_URL ?? ""}/shop/${vendor.storeSlug}`} />
+        </div>
         {!vendorRow?.isApproved && (
           <div className="inline-flex items-center gap-2 mt-3 rounded-2xl px-4 py-2 text-sm" style={{
             background: "#FEF9EC", border: "1px solid #D97706", color: "#D97706",
