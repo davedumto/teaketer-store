@@ -15,10 +15,12 @@ const CANVAS_BG = "#0a0a0a";
 const ACCENT = "#c4f23a";
 const INK = "#f7efe2";
 
-// Mirror the homepage store-card logo fallback (app/page.tsx line 149-150):
-// two-letter initials on an hsl swatch derived from the vendor id.
+// Two-letter initials on an hsl swatch derived from the vendor id, matching the
+// homepage store-card background (app/page.tsx line 131). We sum ALL characters
+// of the id — using only charCodeAt(0) collides, because every cuid starts with
+// 'c' and would give every store the identical hue.
 function fallbackHue(id: string): number {
-  return (id.charCodeAt(0) * 47) % 360;
+  return id.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % 360;
 }
 
 function initials(storeName: string): string {
@@ -95,15 +97,22 @@ export default async function OpengraphImage({
   // unreliably (renders blank). We rewrite the delivery URL to a small, fixed
   // 240×240 PNG via a Cloudinary transform so the embed is always small and
   // decodes cleanly. Non-Cloudinary URLs are fetched as-is.
+  // Cap the logo fetch: logoUrl is vendor-controlled and may point anywhere
+  // (settings only trims it), and this route is force-dynamic + crawler-hit.
+  // Without a timeout a slow host pins the function; without a size cap a huge
+  // body OOMs it. Bound both; any breach falls through to the initials swatch.
+  const MAX_LOGO_BYTES = 2_000_000;
   let logoDataUrl: string | null = null;
   if (vendor.logoUrl) {
     const optimized = toCloudinaryThumb(vendor.logoUrl);
     try {
-      const res = await fetch(optimized);
-      if (res.ok) {
-        const contentTypeHeader = res.headers.get("content-type") ?? "";
-        if (contentTypeHeader.startsWith("image/")) {
-          const buf = Buffer.from(await res.arrayBuffer());
+      const res = await fetch(optimized, { signal: AbortSignal.timeout(3000) });
+      const contentTypeHeader = res.headers.get("content-type") ?? "";
+      const declaredLength = Number(res.headers.get("content-length") ?? "0");
+      if (res.ok && contentTypeHeader.startsWith("image/") && declaredLength <= MAX_LOGO_BYTES) {
+        const buf = Buffer.from(await res.arrayBuffer());
+        // Re-check actual size in case content-length was absent or lied.
+        if (buf.byteLength <= MAX_LOGO_BYTES) {
           logoDataUrl = `data:${contentTypeHeader};base64,${buf.toString("base64")}`;
         }
       }
@@ -180,19 +189,21 @@ export default async function OpengraphImage({
           {name.length > 40 ? `${name.slice(0, 40)}…` : name}
         </div>
 
-        {/* Description */}
+        {/* Description — capped so it fits on a single line at this size/width.
+            Satori clips wrapped overflow silently, so we truncate short rather
+            than rely on line-clamping (which it doesn't support). */}
         {description ? (
           <div
             style={{
+              display: "flex",
               marginTop: 16,
               fontSize: 28,
               color: "rgba(247,239,226,0.6)",
               textAlign: "center",
-              maxWidth: 800,
-              overflow: "hidden",
+              maxWidth: 900,
             }}
           >
-            {description.length > 80 ? `${description.slice(0, 80)}…` : description}
+            {description.length > 58 ? `${description.slice(0, 58).trimEnd()}…` : description}
           </div>
         ) : null}
 
