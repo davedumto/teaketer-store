@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Space_Mono } from "next/font/google";
 import { Suspense } from "react";
 import TopLoader from "@/components/TopLoader";
+import { appUrl } from "@/lib/utils";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -17,6 +18,7 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(appUrl()),
   title: { default: "Teaketer Store", template: "%s · Teaketer Store" },
   description: "Multi-vendor affiliate commerce by Teaketer",
   icons: { icon: "/favicon.ico" },
