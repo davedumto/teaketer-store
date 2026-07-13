@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { formatNaira } from "@/lib/utils";
 import { getPusherClient, storeChannel, EVENTS } from "@/lib/pusher";
@@ -47,6 +47,74 @@ export interface CartItem {
   stockCount: number;
 }
 
+function VariantDropdown({
+  variants,
+  activeVariantId,
+  onChange,
+}: {
+  variants: Variant[];
+  activeVariantId: string | null;
+  onChange: (variantId: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const active = variants.find((v) => v.id === activeVariantId);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  return (
+    <div ref={rootRef} style={{ position: "relative", width: "100%" }}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          width: "100%", height: 30, display: "flex", alignItems: "center", justifyContent: "space-between",
+          fontSize: 12, fontWeight: 600, padding: "0 10px", borderRadius: 6, cursor: "pointer",
+          border: open ? "1.5px solid #1A1A1A" : "1.5px solid #E0E0E0",
+          background: "white", color: "#1A1A1A",
+        }}>
+        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{active?.label ?? "Select"}</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2.5"
+          style={{ flexShrink: 0, marginLeft: 6, transform: open ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      {open && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 20,
+          background: "white", border: "1.5px solid #E0E0E0", borderRadius: 8,
+          boxShadow: "0 8px 24px rgba(0,0,0,0.12)", maxHeight: 220, overflowY: "auto", padding: 4,
+        }}>
+          {variants.map((v) => (
+            <button
+              key={v.id}
+              type="button"
+              onClick={() => { onChange(v.id); setOpen(false); }}
+              style={{
+                width: "100%", textAlign: "left", fontSize: 12, fontWeight: 600, padding: "8px 10px",
+                borderRadius: 5, border: "none", cursor: "pointer",
+                background: v.id === activeVariantId ? "#1A1A1A" : "white",
+                color: v.id === activeVariantId ? "white" : "#1A1A1A",
+              }}
+              onMouseEnter={(e) => { if (v.id !== activeVariantId) e.currentTarget.style.background = "#F5F5F3"; }}
+              onMouseLeave={(e) => { if (v.id !== activeVariantId) e.currentTarget.style.background = "white"; }}
+            >
+              {v.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ProductCard({
   product,
   activeVariantId,
@@ -62,7 +130,20 @@ function ProductCard({
 }) {
   const [qty, setQty] = useState(1);
   const [imgIdx, setImgIdx] = useState(0);
+  const [hovering, setHovering] = useState(false);
+  // Once the user manually picks a thumbnail, auto-cycling stands down until the
+  // next hover session so it doesn't fight their choice.
+  const [autoPaused, setAutoPaused] = useState(false);
   const imgs = product.images ? product.images.split(",").filter(Boolean) : [];
+
+  // Auto-advance through all images while hovered, looping back to the start.
+  useEffect(() => {
+    if (!hovering || autoPaused || imgs.length <= 1) return;
+    const id = setInterval(() => {
+      setImgIdx((i) => (i + 1) % imgs.length);
+    }, 1200);
+    return () => clearInterval(id);
+  }, [hovering, autoPaused, imgs.length]);
   const activeVariant = product.variants.find((v) => v.id === activeVariantId);
   const price = product.basePriceKobo + (activeVariant?.priceOffset ?? 0);
   const stock = product.variants.length === 0
@@ -76,13 +157,13 @@ function ProductCard({
   const outOfStock = stock === 0;
 
   return (
-    <div id={`product-${product.id}`} style={{ display: "flex", flexDirection: "column" }}>
+    <div id={`product-${product.id}`} style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       {/* Image */}
       <div
         className="group"
         style={{ position: "relative", aspectRatio: "1", background: "#F5F5F3", overflow: "hidden", marginBottom: 14 }}
-        onMouseEnter={() => imgs.length > 1 && setImgIdx(1)}
-        onMouseLeave={() => setImgIdx(0)}
+        onMouseEnter={() => setHovering(true)}
+        onMouseLeave={() => { setHovering(false); setImgIdx(0); setAutoPaused(false); }}
       >
         {imgs.length > 0 ? (
           imgs.map((src, i) => (
@@ -114,7 +195,7 @@ function ProductCard({
         {imgs.length > 1 && (
           <div style={{ position: "absolute", bottom: 8, left: 0, right: 0, display: "flex", justifyContent: "center", gap: 4 }}>
             {imgs.map((_, i) => (
-              <button key={i} onClick={() => setImgIdx(i)}
+              <button key={i} onClick={() => { setImgIdx(i); setAutoPaused(true); }}
                 style={{ width: 5, height: 5, borderRadius: "50%", border: "none", cursor: "pointer", padding: 0,
                   background: imgIdx === i ? "#1A1A1A" : "rgba(0,0,0,0.25)", transition: "background 0.2s" }} />
             ))}
@@ -127,28 +208,50 @@ function ProductCard({
         <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: outOfStock ? "#DC2626" : "#999" }}>
           {product.variants.length > 0 ? "Available in variants" : outOfStock ? "Sold out" : "In stock"}
         </div>
-        <div style={{ fontSize: 15, fontWeight: 500, color: "#1A1A1A", lineHeight: 1.35 }}>{product.name}</div>
-        <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A1A" }}>{formatNaira(price)}</div>
+        <div style={{
+          fontSize: 15, fontWeight: 500, color: "#1A1A1A", lineHeight: 1.35, height: 41,
+          display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
+        }}>{product.name}</div>
+        {/* Price + variant dropdown share a row once there are enough variants to need
+            a dropdown (3+) — keeps the card compact instead of stacking them. */}
+        {product.variants.length > 2 ? (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A1A", flexShrink: 0 }}>{formatNaira(price)}</div>
+            <div style={{ width: "50%" }}>
+              <VariantDropdown
+                variants={product.variants}
+                activeVariantId={activeVariantId}
+                onChange={onVariantChange}
+              />
+            </div>
+          </div>
+        ) : (
+          <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A1A" }}>{formatNaira(price)}</div>
+        )}
 
-        {/* Variant pills */}
-        {product.variants.length > 1 && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 2 }}>
-            {product.variants.map((v) => (
-              <button key={v.id} onClick={() => onVariantChange(v.id)}
-                style={{
-                  fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 4, cursor: "pointer",
-                  border: activeVariantId === v.id ? "1.5px solid #1A1A1A" : "1.5px solid #E0E0E0",
-                  background: activeVariantId === v.id ? "#1A1A1A" : "white",
-                  color: activeVariantId === v.id ? "white" : "#555",
-                  transition: "all 0.15s",
-                }}>
-                {v.label}
-              </button>
-            ))}
+        {/* 2-variant pill row — stacked below price since two pills next to a
+            price would overflow/wrap unpredictably at card width. */}
+        {product.variants.length > 1 && product.variants.length <= 2 && (
+          <div style={{ height: 30, marginTop: 2, display: "flex", alignItems: "flex-start" }}>
+            <div style={{ display: "flex", flexWrap: "nowrap", overflowX: "auto", gap: 5, width: "100%" }}>
+              {product.variants.map((v) => (
+                <button key={v.id} onClick={() => onVariantChange(v.id)}
+                  style={{
+                    flexShrink: 0, fontSize: 11, fontWeight: 600, padding: "4px 10px", height: 26, borderRadius: 4, cursor: "pointer",
+                    border: activeVariantId === v.id ? "1.5px solid #1A1A1A" : "1.5px solid #E0E0E0",
+                    background: activeVariantId === v.id ? "#1A1A1A" : "white",
+                    color: activeVariantId === v.id ? "white" : "#555",
+                    transition: "all 0.15s",
+                  }}>
+                  {v.label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Qty + Add */}
+        {/* Qty + Add — pinned to the bottom so it aligns across every card in the row,
+            regardless of whether this product has a variant selector above it. */}
         <div style={{ display: "flex", gap: 8, marginTop: "auto", paddingTop: 10 }}>
           <div style={{ display: "flex", alignItems: "center", border: "1.5px solid #E0E0E0", borderRadius: 6, overflow: "hidden", flexShrink: 0 }}>
             <button onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={outOfStock}
@@ -191,15 +294,11 @@ export default function StorefrontClient({
   const CART_KEY = `cart_${vendor.storeSlug}`;
   const AFF_KEY = `aff_${vendor.storeSlug}`;
 
-  // Initialise cart synchronously from localStorage so the badge count is
-  // correct on the very first render (no flash of zero).
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      const saved = localStorage.getItem(`cart_${vendor.storeSlug}`);
-      return saved ? (JSON.parse(saved) as CartItem[]) : [];
-    } catch { return []; }
-  });
+  // Cart starts empty on both server and client so the first paint always matches
+  // (reading localStorage here would diverge from the server's render and trigger
+  // a hydration error). The real value is loaded from localStorage post-mount below.
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [mounted, setMounted] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [activeVariants, setActiveVariants] = useState<Record<string, string>>(() => {
@@ -210,6 +309,15 @@ export default function StorefrontClient({
     return init;
   });
   const [liveStock, setLiveStock] = useState<Record<string, number>>({});
+
+  // Load the persisted cart after mount — client-only, so it can never mismatch SSR output.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(CART_KEY);
+      if (saved) setCart(JSON.parse(saved) as CartItem[]);
+    } catch { /* ignore corrupt/inaccessible storage */ }
+    setMounted(true);
+  }, [CART_KEY]);
 
   useEffect(() => {
     if (affiliateCode) sessionStorage.setItem(AFF_KEY, affiliateCode.toUpperCase());
@@ -345,7 +453,7 @@ export default function StorefrontClient({
                 <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
               </svg>
               Bag
-              {cartCount > 0 && (
+              {mounted && cartCount > 0 && (
                 <span style={{ position: "absolute", top: -6, right: -6, width: 18, height: 18, borderRadius: "50%", background: "#C4F23A", color: "#1A1A1A", fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   {cartCount}
                 </span>
