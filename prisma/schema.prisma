@@ -110,12 +110,15 @@ model Order {
   deliveryNote    String      @default("")
   // Payment
   reference       String      @unique
-  status          String      @default("pending") // pending | paid | fulfilled | cancelled
+  status          String      @default("pending") // pending | paid | fulfilled | cancelled | refunding | refunded
   totalAmount     Int
   deliveryFee     Int         @default(0)
   platformFeeAmount Int       @default(0)
   affiliateAmount Int         @default(0)
   vendorAmount    Int         @default(0)
+  // Paystack processing fee, charged to the buyer on top of totalAmount (not part of the split above)
+  paystackFeeAmount     Int      @default(0) // estimated at checkout time, what the buyer was charged
+  paystackFeeActualKobo Int?     // actual fee Paystack reported (webhook/verify), audit-only
   affiliatePaidOut Boolean    @default(false)
   paidAt          DateTime?
   fulfilledAt     DateTime?

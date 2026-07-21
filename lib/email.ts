@@ -79,6 +79,7 @@ interface OrderEmailData {
   deliveryAddress: string;
   deliveryState: string;
   totalAmount: number;
+  paystackFeeAmount: number;
   items: Array<{
     productName: string;
     variantLabel: string;
@@ -135,9 +136,14 @@ export async function sendOrderConfirmationEmail(order: OrderEmailData): Promise
         </thead>
         <tbody>${itemsHtml}</tbody>
         <tfoot>
+          ${order.paystackFeeAmount > 0 ? `
+          <tr>
+            <td colspan="2" style="padding:8px 16px;color:rgba(247,239,226,0.6);">Paystack processing fee</td>
+            <td style="padding:8px 16px;text-align:right;color:rgba(247,239,226,0.6);">${formatNaira(order.paystackFeeAmount)}</td>
+          </tr>` : ""}
           <tr style="border-top:1px solid rgba(255,255,255,0.08);">
-            <td colspan="2" style="padding:14px 16px;font-weight:700;">Order Total</td>
-            <td style="padding:14px 16px;text-align:right;font-weight:700;color:#c4f23a;">${formatNaira(order.totalAmount)}</td>
+            <td colspan="2" style="padding:14px 16px;font-weight:700;">Total Paid</td>
+            <td style="padding:14px 16px;text-align:right;font-weight:700;color:#c4f23a;">${formatNaira(order.totalAmount + order.paystackFeeAmount)}</td>
           </tr>
         </tfoot>
       </table>

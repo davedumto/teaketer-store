@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { getVendorFromCookies } from "@/lib/vendorAuth";
 import { prisma } from "@/lib/prisma";
+import { getPlatformCommissionBps } from "@/lib/commerce";
 import SettingsClient from "./SettingsClient";
 
 export default async function SettingsPage() {
@@ -18,7 +19,6 @@ export default async function SettingsPage() {
       logoUrl: true,
       bannerUrl: true,
       allowPublicAffiliate: true,
-      platformFeeBps: true,
       commissionBps: true,
       bankCode: true,
       bankName: true,
@@ -31,6 +31,7 @@ export default async function SettingsPage() {
       socialWhatsapp: true,
     },
   });
+  const platformCommissionBps = await getPlatformCommissionBps();
 
   return (
     <div className="px-6 py-8 max-w-2xl mx-auto">
@@ -38,7 +39,7 @@ export default async function SettingsPage() {
         <div className="eyebrow mb-2" style={{ color: "#999", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>Store Configuration</div>
         <h1 className="font-display" style={{ color: "#1A1A1A", fontSize: "clamp(1.6rem,3vw,2rem)" }}>Settings</h1>
       </div>
-      <SettingsClient vendor={row!} />
+      <SettingsClient vendor={row!} platformCommissionBps={platformCommissionBps} />
     </div>
   );
 }

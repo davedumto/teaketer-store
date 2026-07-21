@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { formatNaira } from "@/lib/utils";
+import { calculatePaystackFee } from "@/lib/paystackFee";
 import type { CartItem } from "./StorefrontClient";
 
 async function lookupAffiliateCode(storeSlug: string, code: string): Promise<boolean> {
@@ -93,7 +94,9 @@ export default function CheckoutModal({
   const subtotal = cart.reduce((s, i) => s + i.priceKobo * i.quantity, 0);
   const stateNotServed = deliveryFee === -1;
   const zonesLoadError = deliveryFee === -2;
-  const total = subtotal + (deliveryFee !== null && deliveryFee >= 0 ? deliveryFee : 0);
+  const orderTotal = subtotal + (deliveryFee !== null && deliveryFee >= 0 ? deliveryFee : 0);
+  const paystackFee = calculatePaystackFee(orderTotal);
+  const total = orderTotal + paystackFee;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -181,6 +184,10 @@ export default function CheckoutModal({
                 This store doesn&apos;t deliver to {form.state}. Please select a different state or contact the vendor.
               </p>
             )}
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+              <span style={{ color: "#666" }}>Paystack processing fee</span>
+              <span style={{ fontWeight: 600, color: "#1A1A1A" }}>{formatNaira(paystackFee)}</span>
+            </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 6, borderTop: "1px solid #EBEBEB" }}>
               <span style={{ fontSize: 13, fontWeight: 700, color: "#1A1A1A" }}>Total</span>
               <span style={{ fontSize: 18, fontWeight: 800, color: "#1A1A1A", letterSpacing: "-0.02em" }}>{formatNaira(total)}</span>

@@ -1,4 +1,20 @@
 import { prisma } from "@/lib/prisma";
+import { initializeTransaction } from "@/lib/paystack";
+import { getSiteSetting } from "@/lib/siteSettings";
+import { calculatePaystackFee } from "@/lib/paystackFee";
+
+const DEFAULT_PLATFORM_COMMISSION_BPS = 500; // 5% — used if superadmin hasn't set one yet
+
+/** Reads the global platform commission rate (bps) set by the superadmin. */
+export async function getPlatformCommissionBps(): Promise<number> {
+  const raw = await getSiteSetting("platform_commission_bps");
+  if (raw === null) return DEFAULT_PLATFORM_COMMISSION_BPS;
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isInteger(parsed) || parsed < 0 || parsed > 10000) {
+    return DEFAULT_PLATFORM_COMMISSION_BPS;
+  }
+  return parsed;
+}
 
 export function computeSplit(
   totalAmount: number,
@@ -41,11 +57,16 @@ export async function generateAffiliateCode(): Promise<string> {
 /** Idempotent payment confirmation. Returns true if this call won the race. */
 export async function markOrderPaid(
   reference: string,
-  paidAt: Date
+  paidAt: Date,
+  paystackFeeActualKobo?: number | null
 ): Promise<boolean> {
   const result = await prisma.order.updateMany({
     where: { reference, status: "pending" },
-    data: { status: "paid", paidAt },
+    data: {
+      status: "paid",
+      paidAt,
+      ...(paystackFeeActualKobo != null ? { paystackFeeActualKobo } : {}),
+    },
   });
   return result.count > 0;
 }
@@ -109,4 +130,34 @@ export async function decrementStock(
     }
   }
   return updates;
+}
+
+/**
+ * Initializes (or re-initializes) a Paystack transaction for an order,
+ * charging the buyer totalAmount + paystackFeeAmount and routing vendorAmount
+ * to the vendor's subaccount. Used by both initial checkout and the repay
+ * flow — paystackFeeAmount must be the value already stamped on the order at
+ * creation time, never recomputed, so a retried payment charges the same
+ * total the buyer originally saw.
+ */
+export async function initializeOrderCheckout(params: {
+  email: string;
+  reference: string;
+  callbackUrl: string;
+  metadata?: Record<string, unknown>;
+  totalAmount: number;
+  paystackFeeAmount: number;
+  vendorAmount: number;
+  vendorSubaccountCode: string | null;
+}): Promise<{ authorizationUrl: string; accessCode: string }> {
+  return initializeTransaction({
+    email: params.email,
+    amount: params.totalAmount + params.paystackFeeAmount,
+    reference: params.reference,
+    callbackUrl: params.callbackUrl,
+    metadata: params.metadata,
+    vendorFlatShare: params.vendorSubaccountCode
+      ? { subaccountCode: params.vendorSubaccountCode, shareKobo: params.vendorAmount }
+      : undefined,
+  });
 }

@@ -58,6 +58,8 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   Affiliate: 'Affiliate',
   AffiliatePayout: 'AffiliatePayout',
+  DeliveryZone: 'DeliveryZone',
+  SiteSetting: 'SiteSetting',
   RateLimit: 'RateLimit'
 } as const
 
@@ -152,9 +154,12 @@ export const OrderScalarFieldEnum = {
   reference: 'reference',
   status: 'status',
   totalAmount: 'totalAmount',
+  deliveryFee: 'deliveryFee',
   platformFeeAmount: 'platformFeeAmount',
   affiliateAmount: 'affiliateAmount',
   vendorAmount: 'vendorAmount',
+  paystackFeeAmount: 'paystackFeeAmount',
+  paystackFeeActualKobo: 'paystackFeeActualKobo',
   affiliatePaidOut: 'affiliatePaidOut',
   paidAt: 'paidAt',
   fulfilledAt: 'fulfilledAt',
@@ -211,6 +216,24 @@ export const AffiliatePayoutScalarFieldEnum = {
 } as const
 
 export type AffiliatePayoutScalarFieldEnum = (typeof AffiliatePayoutScalarFieldEnum)[keyof typeof AffiliatePayoutScalarFieldEnum]
+
+
+export const DeliveryZoneScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  state: 'state',
+  feeKobo: 'feeKobo'
+} as const
+
+export type DeliveryZoneScalarFieldEnum = (typeof DeliveryZoneScalarFieldEnum)[keyof typeof DeliveryZoneScalarFieldEnum]
+
+
+export const SiteSettingScalarFieldEnum = {
+  key: 'key',
+  value: 'value'
+} as const
+
+export type SiteSettingScalarFieldEnum = (typeof SiteSettingScalarFieldEnum)[keyof typeof SiteSettingScalarFieldEnum]
 
 
 export const RateLimitScalarFieldEnum = {

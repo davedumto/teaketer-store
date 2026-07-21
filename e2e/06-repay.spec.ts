@@ -99,6 +99,38 @@ test.describe("Repay flow — buyer UI", () => {
     await expect(page.getByRole("button", { name: /complete payment/i })).toBeVisible({ timeout: 5000 });
   });
 
+  test("checkout summary shows the Paystack processing fee before payment", async ({ page }) => {
+    await page.goto(`/shop/${SLUG}`);
+    const addBtn = page.getByRole("button", { name: /add to bag/i }).first();
+    await expect(addBtn).toBeVisible({ timeout: 8000 });
+    await addBtn.click();
+    await expect(page.getByRole("button", { name: /checkout/i })).toBeVisible({ timeout: 5000 });
+    await page.getByRole("button", { name: /checkout/i }).click();
+
+    await expect(page.getByText(/paystack processing fee/i)).toBeVisible({ timeout: 5000 });
+  });
+
+  test("repay charges the same total as the original checkout (fee not recomputed)", async ({ page }) => {
+    const reference = await createPendingOrder(page, `repay-samefee-${Date.now()}@e2etest.com`);
+    if (!reference) { test.skip(); return; }
+
+    // Read the original order's stored totals via the order API
+    const first = await page.request.get(`/api/store/orders/${reference}`);
+    const firstBody = await first.json();
+    const originalTotal = firstBody.order.totalAmount;
+    const originalFee = firstBody.order.paystackFeeAmount;
+
+    await page.goto(`/shop/${SLUG}/order/${reference}`);
+    await expect(page.getByRole("button", { name: /complete payment/i })).toBeVisible({ timeout: 8000 });
+    await page.getByRole("button", { name: /complete payment/i }).click();
+
+    // Re-fetch the order — repay must not have mutated the stored fee/total
+    const second = await page.request.get(`/api/store/orders/${reference}`);
+    const secondBody = await second.json();
+    expect(secondBody.order.totalAmount).toBe(originalTotal);
+    expect(secondBody.order.paystackFeeAmount).toBe(originalFee);
+  });
+
   test("Complete payment button calls repay API", async ({ page }) => {
     const reference = await createPendingOrder(page, `repay-btn-${Date.now()}@e2etest.com`);
     if (!reference) { test.skip(); return; }

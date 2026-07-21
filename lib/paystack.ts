@@ -34,8 +34,10 @@ export async function initializeTransaction(params: {
   if (params.vendorFlatShare) {
     body.split = {
       type: "flat",
-      bearer_type: "subaccount",
-      bearer_subaccount: params.vendorFlatShare.subaccountCode,
+      // "account" — the platform's main balance absorbs Paystack's processing
+      // fee, not the vendor's subaccount. The buyer already paid for this fee
+      // via the paystackFeeAmount upcharge added to `amount` above.
+      bearer_type: "account",
       subaccounts: [
         {
           subaccount: params.vendorFlatShare.subaccountCode,
@@ -62,7 +64,7 @@ export async function initializeTransaction(params: {
 
 export async function verifyTransaction(
   reference: string
-): Promise<{ status: string; amount: number; email: string }> {
+): Promise<{ status: string; amount: number; email: string; feesKobo: number | null }> {
   const res = await fetch(
     `${PAYSTACK_BASE}/transaction/verify/${encodeURIComponent(reference)}`,
     { headers: { Authorization: `Bearer ${secretKey()}` } }
@@ -73,6 +75,7 @@ export async function verifyTransaction(
     status: json.data.status,
     amount: json.data.amount,
     email: json.data.customer.email,
+    feesKobo: typeof json.data.fees === "number" ? json.data.fees : null,
   };
 }
 

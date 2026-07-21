@@ -10,7 +10,6 @@ interface VendorData {
   logoUrl: string;
   bannerUrl: string;
   allowPublicAffiliate: boolean;
-  platformFeeBps: number;
   commissionBps: number;
   bankCode: string | null;
   bankName: string | null;
@@ -111,7 +110,13 @@ function ImageUploadField({
   );
 }
 
-export default function SettingsClient({ vendor }: { vendor: VendorData }) {
+export default function SettingsClient({
+  vendor,
+  platformCommissionBps,
+}: {
+  vendor: VendorData;
+  platformCommissionBps: number;
+}) {
   const router = useRouter();
   const [form, setForm] = useState({
     storeName: vendor.storeName,
@@ -318,8 +323,8 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
 
         {/* Platform fee — read only */}
         <div className="rounded-2xl p-4 mb-4" style={{ background: "#FAFAF8", border: "1px solid #EBEBEB" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#BBB", marginBottom: 4 }}>Platform Fee (Teaketer's cut · fixed)</div>
-          <div style={{ fontSize: 24, fontWeight: 800, color: "#1A1A1A" }}>{(vendor.platformFeeBps / 100).toFixed(1)}%</div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#BBB", marginBottom: 4 }}>Platform Fee (Teaketer's cut · set by Teaketer)</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: "#1A1A1A" }}>{(platformCommissionBps / 100).toFixed(1)}%</div>
           <div style={{ fontSize: 12, color: "#999", marginTop: 4 }}>Deducted from every order. You keep the rest after affiliate commission.</div>
         </div>
 
@@ -344,7 +349,7 @@ export default function SettingsClient({ vendor }: { vendor: VendorData }) {
             <div style={{ fontSize: 12, color: "#888" }}>Minimum 5% · Maximum 50%</div>
           </div>
           <div style={{ marginTop: 12, background: "#F0FDD4", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "#2D6A00" }}>
-            Example: on a ₦10,000 order → affiliate earns <strong>₦{(10000 * (Number(form.commissionPct) || 0) / 100).toLocaleString()}</strong>, you receive <strong>₦{(10000 * (1 - (vendor.platformFeeBps / 10000) - (Number(form.commissionPct) || 0) / 100)).toLocaleString()}</strong>
+            Example: on a ₦10,000 order → affiliate earns <strong>₦{(10000 * (Number(form.commissionPct) || 0) / 100).toLocaleString()}</strong>, you receive <strong>₦{(10000 * (1 - (platformCommissionBps / 10000) - (Number(form.commissionPct) || 0) / 100)).toLocaleString()}</strong>
           </div>
           <div style={{ marginTop: 8, fontSize: 11, color: "#BBB" }}>
             This rate is shown to affiliates before they sign up. Higher rates attract more promoters.

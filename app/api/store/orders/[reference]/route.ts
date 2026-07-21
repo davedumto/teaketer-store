@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyTransaction, initializeTransaction } from "@/lib/paystack";
-import { markOrderPaid, decrementStock } from "@/lib/commerce";
+import { verifyTransaction } from "@/lib/paystack";
+import { markOrderPaid, decrementStock, initializeOrderCheckout } from "@/lib/commerce";
 import { sendOrderConfirmationEmail, sendVendorOrderEmail } from "@/lib/email";
 import { appUrl } from "@/lib/utils";
 import { after } from "next/server";
@@ -29,7 +29,7 @@ export async function GET(
     try {
       const ps = await verifyTransaction(reference);
       if (ps.status === "success") {
-        const won = await markOrderPaid(reference, new Date());
+        const won = await markOrderPaid(reference, new Date(), ps.feesKobo);
         if (won) {
           after(async () => {
             const fresh = await prisma.order.findUnique({
@@ -111,15 +111,18 @@ export async function POST(
   const callbackUrl = `${appUrl()}/shop/${order.vendor.storeSlug}/order/${reference}`;
 
   try {
-    const ps = await initializeTransaction({
+    // Reuse the fee/split amounts stamped on the order at creation time —
+    // never recompute, so a retried payment charges the same total the buyer
+    // originally saw.
+    const ps = await initializeOrderCheckout({
       email: order.buyerEmail,
-      amount: order.totalAmount,
       reference,
       callbackUrl,
       metadata: { orderId: order.id, storeSlug: order.vendor.storeSlug, buyerName: order.buyerName },
-      vendorFlatShare: order.vendor.paystackSubaccountCode
-        ? { subaccountCode: order.vendor.paystackSubaccountCode, shareKobo: order.vendorAmount }
-        : undefined,
+      totalAmount: order.totalAmount,
+      paystackFeeAmount: order.paystackFeeAmount,
+      vendorAmount: order.vendorAmount,
+      vendorSubaccountCode: order.vendor.paystackSubaccountCode,
     });
     return NextResponse.json({ authorizationUrl: ps.authorizationUrl });
   } catch (err) {

@@ -86,9 +86,21 @@ export default async function OrderPage({
                 </div>
               ))}
             </div>
+            {order.deliveryFee > 0 && (
+              <div className="flex justify-between text-sm mt-2">
+                <span style={{ color: "#555550" }}>Delivery</span>
+                <span className="font-semibold" style={{ color: "#0D0D0D" }}>{formatNaira(order.deliveryFee)}</span>
+              </div>
+            )}
+            {order.paystackFeeAmount > 0 && (
+              <div className="flex justify-between text-sm mt-2">
+                <span style={{ color: "#555550" }}>Paystack processing fee</span>
+                <span className="font-semibold" style={{ color: "#0D0D0D" }}>{formatNaira(order.paystackFeeAmount)}</span>
+              </div>
+            )}
             <div className="flex justify-between font-display font-bold text-base mt-3 pt-3" style={{ borderTop: "1px solid #E8E8E4" }}>
-              <span style={{ color: "#0D0D0D" }}>Total</span>
-              <span style={{ color: "#0D0D0D" }}>{formatNaira(order.totalAmount)}</span>
+              <span style={{ color: "#0D0D0D" }}>Total Paid</span>
+              <span style={{ color: "#0D0D0D" }}>{formatNaira(order.totalAmount + order.paystackFeeAmount)}</span>
             </div>
           </div>
 

@@ -399,6 +399,7 @@ export type VendorWhereInput = {
   products?: Prisma.ProductListRelationFilter
   orders?: Prisma.OrderListRelationFilter
   affiliates?: Prisma.AffiliateListRelationFilter
+  deliveryZones?: Prisma.DeliveryZoneListRelationFilter
 }
 
 export type VendorOrderByWithRelationInput = {
@@ -432,6 +433,7 @@ export type VendorOrderByWithRelationInput = {
   products?: Prisma.ProductOrderByRelationAggregateInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
   affiliates?: Prisma.AffiliateOrderByRelationAggregateInput
+  deliveryZones?: Prisma.DeliveryZoneOrderByRelationAggregateInput
 }
 
 export type VendorWhereUniqueInput = Prisma.AtLeast<{
@@ -468,6 +470,7 @@ export type VendorWhereUniqueInput = Prisma.AtLeast<{
   products?: Prisma.ProductListRelationFilter
   orders?: Prisma.OrderListRelationFilter
   affiliates?: Prisma.AffiliateListRelationFilter
+  deliveryZones?: Prisma.DeliveryZoneListRelationFilter
 }, "id" | "email" | "storeSlug">
 
 export type VendorOrderByWithAggregationInput = {
@@ -569,6 +572,7 @@ export type VendorCreateInput = {
   products?: Prisma.ProductCreateNestedManyWithoutVendorInput
   orders?: Prisma.OrderCreateNestedManyWithoutVendorInput
   affiliates?: Prisma.AffiliateCreateNestedManyWithoutVendorInput
+  deliveryZones?: Prisma.DeliveryZoneCreateNestedManyWithoutVendorInput
 }
 
 export type VendorUncheckedCreateInput = {
@@ -602,6 +606,7 @@ export type VendorUncheckedCreateInput = {
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutVendorInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutVendorInput
   affiliates?: Prisma.AffiliateUncheckedCreateNestedManyWithoutVendorInput
+  deliveryZones?: Prisma.DeliveryZoneUncheckedCreateNestedManyWithoutVendorInput
 }
 
 export type VendorUpdateInput = {
@@ -635,6 +640,7 @@ export type VendorUpdateInput = {
   products?: Prisma.ProductUpdateManyWithoutVendorNestedInput
   orders?: Prisma.OrderUpdateManyWithoutVendorNestedInput
   affiliates?: Prisma.AffiliateUpdateManyWithoutVendorNestedInput
+  deliveryZones?: Prisma.DeliveryZoneUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorUncheckedUpdateInput = {
@@ -668,6 +674,7 @@ export type VendorUncheckedUpdateInput = {
   products?: Prisma.ProductUncheckedUpdateManyWithoutVendorNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutVendorNestedInput
   affiliates?: Prisma.AffiliateUncheckedUpdateManyWithoutVendorNestedInput
+  deliveryZones?: Prisma.DeliveryZoneUncheckedUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorCreateManyInput = {
@@ -935,6 +942,20 @@ export type VendorUpdateOneRequiredWithoutAffiliatesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutAffiliatesInput, Prisma.VendorUpdateWithoutAffiliatesInput>, Prisma.VendorUncheckedUpdateWithoutAffiliatesInput>
 }
 
+export type VendorCreateNestedOneWithoutDeliveryZonesInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutDeliveryZonesInput, Prisma.VendorUncheckedCreateWithoutDeliveryZonesInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutDeliveryZonesInput
+  connect?: Prisma.VendorWhereUniqueInput
+}
+
+export type VendorUpdateOneRequiredWithoutDeliveryZonesNestedInput = {
+  create?: Prisma.XOR<Prisma.VendorCreateWithoutDeliveryZonesInput, Prisma.VendorUncheckedCreateWithoutDeliveryZonesInput>
+  connectOrCreate?: Prisma.VendorCreateOrConnectWithoutDeliveryZonesInput
+  upsert?: Prisma.VendorUpsertWithoutDeliveryZonesInput
+  connect?: Prisma.VendorWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VendorUpdateToOneWithWhereWithoutDeliveryZonesInput, Prisma.VendorUpdateWithoutDeliveryZonesInput>, Prisma.VendorUncheckedUpdateWithoutDeliveryZonesInput>
+}
+
 export type VendorCreateWithoutProductsInput = {
   id?: string
   name: string
@@ -965,6 +986,7 @@ export type VendorCreateWithoutProductsInput = {
   updatedAt?: Date | string
   orders?: Prisma.OrderCreateNestedManyWithoutVendorInput
   affiliates?: Prisma.AffiliateCreateNestedManyWithoutVendorInput
+  deliveryZones?: Prisma.DeliveryZoneCreateNestedManyWithoutVendorInput
 }
 
 export type VendorUncheckedCreateWithoutProductsInput = {
@@ -997,6 +1019,7 @@ export type VendorUncheckedCreateWithoutProductsInput = {
   updatedAt?: Date | string
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutVendorInput
   affiliates?: Prisma.AffiliateUncheckedCreateNestedManyWithoutVendorInput
+  deliveryZones?: Prisma.DeliveryZoneUncheckedCreateNestedManyWithoutVendorInput
 }
 
 export type VendorCreateOrConnectWithoutProductsInput = {
@@ -1045,6 +1068,7 @@ export type VendorUpdateWithoutProductsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUpdateManyWithoutVendorNestedInput
   affiliates?: Prisma.AffiliateUpdateManyWithoutVendorNestedInput
+  deliveryZones?: Prisma.DeliveryZoneUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorUncheckedUpdateWithoutProductsInput = {
@@ -1077,6 +1101,7 @@ export type VendorUncheckedUpdateWithoutProductsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUncheckedUpdateManyWithoutVendorNestedInput
   affiliates?: Prisma.AffiliateUncheckedUpdateManyWithoutVendorNestedInput
+  deliveryZones?: Prisma.DeliveryZoneUncheckedUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorCreateWithoutOrdersInput = {
@@ -1109,6 +1134,7 @@ export type VendorCreateWithoutOrdersInput = {
   updatedAt?: Date | string
   products?: Prisma.ProductCreateNestedManyWithoutVendorInput
   affiliates?: Prisma.AffiliateCreateNestedManyWithoutVendorInput
+  deliveryZones?: Prisma.DeliveryZoneCreateNestedManyWithoutVendorInput
 }
 
 export type VendorUncheckedCreateWithoutOrdersInput = {
@@ -1141,6 +1167,7 @@ export type VendorUncheckedCreateWithoutOrdersInput = {
   updatedAt?: Date | string
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutVendorInput
   affiliates?: Prisma.AffiliateUncheckedCreateNestedManyWithoutVendorInput
+  deliveryZones?: Prisma.DeliveryZoneUncheckedCreateNestedManyWithoutVendorInput
 }
 
 export type VendorCreateOrConnectWithoutOrdersInput = {
@@ -1189,6 +1216,7 @@ export type VendorUpdateWithoutOrdersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUpdateManyWithoutVendorNestedInput
   affiliates?: Prisma.AffiliateUpdateManyWithoutVendorNestedInput
+  deliveryZones?: Prisma.DeliveryZoneUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorUncheckedUpdateWithoutOrdersInput = {
@@ -1221,6 +1249,7 @@ export type VendorUncheckedUpdateWithoutOrdersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUncheckedUpdateManyWithoutVendorNestedInput
   affiliates?: Prisma.AffiliateUncheckedUpdateManyWithoutVendorNestedInput
+  deliveryZones?: Prisma.DeliveryZoneUncheckedUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorCreateWithoutAffiliatesInput = {
@@ -1253,6 +1282,7 @@ export type VendorCreateWithoutAffiliatesInput = {
   updatedAt?: Date | string
   products?: Prisma.ProductCreateNestedManyWithoutVendorInput
   orders?: Prisma.OrderCreateNestedManyWithoutVendorInput
+  deliveryZones?: Prisma.DeliveryZoneCreateNestedManyWithoutVendorInput
 }
 
 export type VendorUncheckedCreateWithoutAffiliatesInput = {
@@ -1285,6 +1315,7 @@ export type VendorUncheckedCreateWithoutAffiliatesInput = {
   updatedAt?: Date | string
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutVendorInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutVendorInput
+  deliveryZones?: Prisma.DeliveryZoneUncheckedCreateNestedManyWithoutVendorInput
 }
 
 export type VendorCreateOrConnectWithoutAffiliatesInput = {
@@ -1333,6 +1364,7 @@ export type VendorUpdateWithoutAffiliatesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUpdateManyWithoutVendorNestedInput
   orders?: Prisma.OrderUpdateManyWithoutVendorNestedInput
+  deliveryZones?: Prisma.DeliveryZoneUpdateManyWithoutVendorNestedInput
 }
 
 export type VendorUncheckedUpdateWithoutAffiliatesInput = {
@@ -1365,6 +1397,155 @@ export type VendorUncheckedUpdateWithoutAffiliatesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUncheckedUpdateManyWithoutVendorNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutVendorNestedInput
+  deliveryZones?: Prisma.DeliveryZoneUncheckedUpdateManyWithoutVendorNestedInput
+}
+
+export type VendorCreateWithoutDeliveryZonesInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  storeName: string
+  storeSlug: string
+  storeDescription?: string
+  logoUrl?: string
+  bannerUrl?: string
+  isApproved?: boolean
+  isActive?: boolean
+  paystackSubaccountCode?: string | null
+  bankCode?: string | null
+  bankName?: string | null
+  accountNumber?: string | null
+  accountName?: string | null
+  platformFeeBps?: number
+  commissionBps?: number
+  allowPublicAffiliate?: boolean
+  businessPageUrl?: string
+  socialInstagram?: string
+  socialFacebook?: string
+  socialWhatsapp?: string
+  resetToken?: string | null
+  resetTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  products?: Prisma.ProductCreateNestedManyWithoutVendorInput
+  orders?: Prisma.OrderCreateNestedManyWithoutVendorInput
+  affiliates?: Prisma.AffiliateCreateNestedManyWithoutVendorInput
+}
+
+export type VendorUncheckedCreateWithoutDeliveryZonesInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  storeName: string
+  storeSlug: string
+  storeDescription?: string
+  logoUrl?: string
+  bannerUrl?: string
+  isApproved?: boolean
+  isActive?: boolean
+  paystackSubaccountCode?: string | null
+  bankCode?: string | null
+  bankName?: string | null
+  accountNumber?: string | null
+  accountName?: string | null
+  platformFeeBps?: number
+  commissionBps?: number
+  allowPublicAffiliate?: boolean
+  businessPageUrl?: string
+  socialInstagram?: string
+  socialFacebook?: string
+  socialWhatsapp?: string
+  resetToken?: string | null
+  resetTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutVendorInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutVendorInput
+  affiliates?: Prisma.AffiliateUncheckedCreateNestedManyWithoutVendorInput
+}
+
+export type VendorCreateOrConnectWithoutDeliveryZonesInput = {
+  where: Prisma.VendorWhereUniqueInput
+  create: Prisma.XOR<Prisma.VendorCreateWithoutDeliveryZonesInput, Prisma.VendorUncheckedCreateWithoutDeliveryZonesInput>
+}
+
+export type VendorUpsertWithoutDeliveryZonesInput = {
+  update: Prisma.XOR<Prisma.VendorUpdateWithoutDeliveryZonesInput, Prisma.VendorUncheckedUpdateWithoutDeliveryZonesInput>
+  create: Prisma.XOR<Prisma.VendorCreateWithoutDeliveryZonesInput, Prisma.VendorUncheckedCreateWithoutDeliveryZonesInput>
+  where?: Prisma.VendorWhereInput
+}
+
+export type VendorUpdateToOneWithWhereWithoutDeliveryZonesInput = {
+  where?: Prisma.VendorWhereInput
+  data: Prisma.XOR<Prisma.VendorUpdateWithoutDeliveryZonesInput, Prisma.VendorUncheckedUpdateWithoutDeliveryZonesInput>
+}
+
+export type VendorUpdateWithoutDeliveryZonesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  storeSlug?: Prisma.StringFieldUpdateOperationsInput | string
+  storeDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  logoUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  bannerUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  paystackSubaccountCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bankCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bankName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  platformFeeBps?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionBps?: Prisma.IntFieldUpdateOperationsInput | number
+  allowPublicAffiliate?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  businessPageUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  socialInstagram?: Prisma.StringFieldUpdateOperationsInput | string
+  socialFacebook?: Prisma.StringFieldUpdateOperationsInput | string
+  socialWhatsapp?: Prisma.StringFieldUpdateOperationsInput | string
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  products?: Prisma.ProductUpdateManyWithoutVendorNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutVendorNestedInput
+  affiliates?: Prisma.AffiliateUpdateManyWithoutVendorNestedInput
+}
+
+export type VendorUncheckedUpdateWithoutDeliveryZonesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  storeName?: Prisma.StringFieldUpdateOperationsInput | string
+  storeSlug?: Prisma.StringFieldUpdateOperationsInput | string
+  storeDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  logoUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  bannerUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  paystackSubaccountCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bankCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bankName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  platformFeeBps?: Prisma.IntFieldUpdateOperationsInput | number
+  commissionBps?: Prisma.IntFieldUpdateOperationsInput | number
+  allowPublicAffiliate?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  businessPageUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  socialInstagram?: Prisma.StringFieldUpdateOperationsInput | string
+  socialFacebook?: Prisma.StringFieldUpdateOperationsInput | string
+  socialWhatsapp?: Prisma.StringFieldUpdateOperationsInput | string
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  products?: Prisma.ProductUncheckedUpdateManyWithoutVendorNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutVendorNestedInput
+  affiliates?: Prisma.AffiliateUncheckedUpdateManyWithoutVendorNestedInput
 }
 
 
@@ -1376,12 +1557,14 @@ export type VendorCountOutputType = {
   products: number
   orders: number
   affiliates: number
+  deliveryZones: number
 }
 
 export type VendorCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   products?: boolean | VendorCountOutputTypeCountProductsArgs
   orders?: boolean | VendorCountOutputTypeCountOrdersArgs
   affiliates?: boolean | VendorCountOutputTypeCountAffiliatesArgs
+  deliveryZones?: boolean | VendorCountOutputTypeCountDeliveryZonesArgs
 }
 
 /**
@@ -1413,6 +1596,13 @@ export type VendorCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.E
  */
 export type VendorCountOutputTypeCountAffiliatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AffiliateWhereInput
+}
+
+/**
+ * VendorCountOutputType without action
+ */
+export type VendorCountOutputTypeCountDeliveryZonesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryZoneWhereInput
 }
 
 
@@ -1447,6 +1637,7 @@ export type VendorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   products?: boolean | Prisma.Vendor$productsArgs<ExtArgs>
   orders?: boolean | Prisma.Vendor$ordersArgs<ExtArgs>
   affiliates?: boolean | Prisma.Vendor$affiliatesArgs<ExtArgs>
+  deliveryZones?: boolean | Prisma.Vendor$deliveryZonesArgs<ExtArgs>
   _count?: boolean | Prisma.VendorCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vendor"]>
 
@@ -1545,6 +1736,7 @@ export type VendorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   products?: boolean | Prisma.Vendor$productsArgs<ExtArgs>
   orders?: boolean | Prisma.Vendor$ordersArgs<ExtArgs>
   affiliates?: boolean | Prisma.Vendor$affiliatesArgs<ExtArgs>
+  deliveryZones?: boolean | Prisma.Vendor$deliveryZonesArgs<ExtArgs>
   _count?: boolean | Prisma.VendorCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type VendorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1556,6 +1748,7 @@ export type $VendorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     products: Prisma.$ProductPayload<ExtArgs>[]
     orders: Prisma.$OrderPayload<ExtArgs>[]
     affiliates: Prisma.$AffiliatePayload<ExtArgs>[]
+    deliveryZones: Prisma.$DeliveryZonePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1982,6 +2175,7 @@ export interface Prisma__VendorClient<T, Null = never, ExtArgs extends runtime.T
   products<T extends Prisma.Vendor$productsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$productsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orders<T extends Prisma.Vendor$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   affiliates<T extends Prisma.Vendor$affiliatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$affiliatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AffiliatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  deliveryZones<T extends Prisma.Vendor$deliveryZonesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vendor$deliveryZonesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2498,6 +2692,30 @@ export type Vendor$affiliatesArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.AffiliateScalarFieldEnum | Prisma.AffiliateScalarFieldEnum[]
+}
+
+/**
+ * Vendor.deliveryZones
+ */
+export type Vendor$deliveryZonesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeliveryZone
+   */
+  select?: Prisma.DeliveryZoneSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeliveryZone
+   */
+  omit?: Prisma.DeliveryZoneOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryZoneInclude<ExtArgs> | null
+  where?: Prisma.DeliveryZoneWhereInput
+  orderBy?: Prisma.DeliveryZoneOrderByWithRelationInput | Prisma.DeliveryZoneOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryZoneWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryZoneScalarFieldEnum | Prisma.DeliveryZoneScalarFieldEnum[]
 }
 
 /**

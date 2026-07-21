@@ -26,6 +26,16 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "value must be a string" }, { status: 422 });
   }
 
+  if (key.trim() === "platform_commission_bps") {
+    const bps = Number.parseInt(value.trim(), 10);
+    if (!Number.isInteger(bps) || String(bps) !== value.trim() || bps < 0 || bps > 10000) {
+      return NextResponse.json(
+        { error: "Commission must be a whole number of basis points between 0 and 10000 (0-100%)." },
+        { status: 422 }
+      );
+    }
+  }
+
   await prisma.$executeRaw`
     INSERT OR REPLACE INTO SiteSetting (key, value) VALUES (${key.trim()}, ${value.trim()})
   `;

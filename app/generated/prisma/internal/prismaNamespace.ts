@@ -391,6 +391,8 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   Affiliate: 'Affiliate',
   AffiliatePayout: 'AffiliatePayout',
+  DeliveryZone: 'DeliveryZone',
+  SiteSetting: 'SiteSetting',
   RateLimit: 'RateLimit'
 } as const
 
@@ -407,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "vendor" | "product" | "productVariant" | "order" | "orderItem" | "affiliate" | "affiliatePayout" | "rateLimit"
+    modelProps: "vendor" | "product" | "productVariant" | "order" | "orderItem" | "affiliate" | "affiliatePayout" | "deliveryZone" | "siteSetting" | "rateLimit"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -929,6 +931,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DeliveryZone: {
+      payload: Prisma.$DeliveryZonePayload<ExtArgs>
+      fields: Prisma.DeliveryZoneFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DeliveryZoneFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryZonePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DeliveryZoneFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryZonePayload>
+        }
+        findFirst: {
+          args: Prisma.DeliveryZoneFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryZonePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DeliveryZoneFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryZonePayload>
+        }
+        findMany: {
+          args: Prisma.DeliveryZoneFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryZonePayload>[]
+        }
+        create: {
+          args: Prisma.DeliveryZoneCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryZonePayload>
+        }
+        createMany: {
+          args: Prisma.DeliveryZoneCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DeliveryZoneCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryZonePayload>[]
+        }
+        delete: {
+          args: Prisma.DeliveryZoneDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryZonePayload>
+        }
+        update: {
+          args: Prisma.DeliveryZoneUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryZonePayload>
+        }
+        deleteMany: {
+          args: Prisma.DeliveryZoneDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DeliveryZoneUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DeliveryZoneUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryZonePayload>[]
+        }
+        upsert: {
+          args: Prisma.DeliveryZoneUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryZonePayload>
+        }
+        aggregate: {
+          args: Prisma.DeliveryZoneAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDeliveryZone>
+        }
+        groupBy: {
+          args: Prisma.DeliveryZoneGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeliveryZoneGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DeliveryZoneCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeliveryZoneCountAggregateOutputType> | number
+        }
+      }
+    }
+    SiteSetting: {
+      payload: Prisma.$SiteSettingPayload<ExtArgs>
+      fields: Prisma.SiteSettingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SiteSettingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteSettingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SiteSettingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteSettingPayload>
+        }
+        findFirst: {
+          args: Prisma.SiteSettingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteSettingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SiteSettingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteSettingPayload>
+        }
+        findMany: {
+          args: Prisma.SiteSettingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteSettingPayload>[]
+        }
+        create: {
+          args: Prisma.SiteSettingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteSettingPayload>
+        }
+        createMany: {
+          args: Prisma.SiteSettingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SiteSettingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteSettingPayload>[]
+        }
+        delete: {
+          args: Prisma.SiteSettingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteSettingPayload>
+        }
+        update: {
+          args: Prisma.SiteSettingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteSettingPayload>
+        }
+        deleteMany: {
+          args: Prisma.SiteSettingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SiteSettingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SiteSettingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteSettingPayload>[]
+        }
+        upsert: {
+          args: Prisma.SiteSettingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteSettingPayload>
+        }
+        aggregate: {
+          args: Prisma.SiteSettingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSiteSetting>
+        }
+        groupBy: {
+          args: Prisma.SiteSettingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SiteSettingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SiteSettingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SiteSettingCountAggregateOutputType> | number
+        }
+      }
+    }
     RateLimit: {
       payload: Prisma.$RateLimitPayload<ExtArgs>
       fields: Prisma.RateLimitFieldRefs
@@ -1117,9 +1267,12 @@ export const OrderScalarFieldEnum = {
   reference: 'reference',
   status: 'status',
   totalAmount: 'totalAmount',
+  deliveryFee: 'deliveryFee',
   platformFeeAmount: 'platformFeeAmount',
   affiliateAmount: 'affiliateAmount',
   vendorAmount: 'vendorAmount',
+  paystackFeeAmount: 'paystackFeeAmount',
+  paystackFeeActualKobo: 'paystackFeeActualKobo',
   affiliatePaidOut: 'affiliatePaidOut',
   paidAt: 'paidAt',
   fulfilledAt: 'fulfilledAt',
@@ -1176,6 +1329,24 @@ export const AffiliatePayoutScalarFieldEnum = {
 } as const
 
 export type AffiliatePayoutScalarFieldEnum = (typeof AffiliatePayoutScalarFieldEnum)[keyof typeof AffiliatePayoutScalarFieldEnum]
+
+
+export const DeliveryZoneScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  state: 'state',
+  feeKobo: 'feeKobo'
+} as const
+
+export type DeliveryZoneScalarFieldEnum = (typeof DeliveryZoneScalarFieldEnum)[keyof typeof DeliveryZoneScalarFieldEnum]
+
+
+export const SiteSettingScalarFieldEnum = {
+  key: 'key',
+  value: 'value'
+} as const
+
+export type SiteSettingScalarFieldEnum = (typeof SiteSettingScalarFieldEnum)[keyof typeof SiteSettingScalarFieldEnum]
 
 
 export const RateLimitScalarFieldEnum = {
@@ -1360,6 +1531,8 @@ export type GlobalOmitConfig = {
   orderItem?: Prisma.OrderItemOmit
   affiliate?: Prisma.AffiliateOmit
   affiliatePayout?: Prisma.AffiliatePayoutOmit
+  deliveryZone?: Prisma.DeliveryZoneOmit
+  siteSetting?: Prisma.SiteSettingOmit
   rateLimit?: Prisma.RateLimitOmit
 }
 

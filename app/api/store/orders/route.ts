@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { rateLimit, getClientIp, rateLimitResponse } from "@/lib/rateLimit";
-import { initializeTransaction } from "@/lib/paystack";
-import { computeSplit } from "@/lib/commerce";
+import { computeSplit, getPlatformCommissionBps, initializeOrderCheckout } from "@/lib/commerce";
+import { calculatePaystackFee } from "@/lib/paystackFee";
 import { appUrl } from "@/lib/utils";
 
 const NIGERIAN_STATES = [
@@ -125,12 +125,14 @@ export async function POST(req: NextRequest) {
   const deliveryFee = zones[0]?.feeKobo ?? 0;
   const totalAmount = subtotalAmount + deliveryFee;
 
+  const platformCommissionBps = await getPlatformCommissionBps();
   const { platformFeeAmount, affiliateAmount, vendorAmount } = computeSplit(
     totalAmount,
-    vendor.platformFeeBps,
+    platformCommissionBps,
     vendor.commissionBps,
     !!affiliate
   );
+  const paystackFeeAmount = calculatePaystackFee(totalAmount);
 
   const reference = `ts_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
@@ -146,9 +148,11 @@ export async function POST(req: NextRequest) {
       deliveryNote: typeof deliveryNote === "string" ? deliveryNote.trim() : "",
       reference,
       totalAmount,
+      deliveryFee,
       platformFeeAmount,
       affiliateAmount,
       vendorAmount,
+      paystackFeeAmount,
       items: {
         create: resolvedItems.map((i) => ({
           productId: i.productId,
@@ -162,27 +166,19 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // Stamp deliveryFee using raw SQL since generated client may not include the new column yet
-  if (deliveryFee > 0) {
-    await prisma.$executeRaw`UPDATE "Order" SET deliveryFee = ${deliveryFee} WHERE id = ${order.id}`;
-  }
-
   const callbackUrl = `${appUrl()}/shop/${storeSlug}/order/${reference}`;
 
   let authorizationUrl: string;
   try {
-    const ps = await initializeTransaction({
+    const ps = await initializeOrderCheckout({
       email: buyerEmail.trim().toLowerCase(),
-      amount: totalAmount,
       reference,
       callbackUrl,
       metadata: { orderId: order.id, storeSlug, buyerName: buyerName.trim() },
-      vendorFlatShare: vendor.paystackSubaccountCode
-        ? {
-            subaccountCode: vendor.paystackSubaccountCode,
-            shareKobo: vendorAmount,
-          }
-        : undefined,
+      totalAmount,
+      paystackFeeAmount,
+      vendorAmount,
+      vendorSubaccountCode: vendor.paystackSubaccountCode,
     });
     authorizationUrl = ps.authorizationUrl;
   } catch (err) {

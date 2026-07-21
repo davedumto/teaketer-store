@@ -33,7 +33,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  const won = await markOrderPaid(reference, new Date());
+  const feesKobo = typeof data.fees === "number" ? data.fees : null;
+  const won = await markOrderPaid(reference, new Date(), feesKobo);
 
   if (won) {
     after(async () => {

@@ -53,6 +53,16 @@ export type Affiliate = Prisma.AffiliateModel
  */
 export type AffiliatePayout = Prisma.AffiliatePayoutModel
 /**
+ * Model DeliveryZone
+ * 
+ */
+export type DeliveryZone = Prisma.DeliveryZoneModel
+/**
+ * Model SiteSetting
+ * 
+ */
+export type SiteSetting = Prisma.SiteSettingModel
+/**
  * Model RateLimit
  * 
  */
