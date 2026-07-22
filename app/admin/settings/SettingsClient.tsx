@@ -138,7 +138,7 @@ export default function SettingsClient({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [deliveryZones, setDeliveryZones] = useState<{ state: string; feeKobo: number }[]>([]);
+  const [deliveryZones, setDeliveryZones] = useState<{ state: string; feeKobo: number; freeDeliveryLocation: string | null }[]>([]);
   const [deliverySaving, setDeliverySaving] = useState(false);
   const [deliverySuccess, setDeliverySuccess] = useState("");
   const [deliveryError, setDeliveryError] = useState("");
@@ -162,9 +162,22 @@ export default function SettingsClient({
     return deliveryZones.find((z) => z.state === state)?.feeKobo ?? null;
   }
 
+  function getZoneLocation(state: string) {
+    return deliveryZones.find((z) => z.state === state)?.freeDeliveryLocation ?? "";
+  }
+
   function setZoneFee(state: string, feeNaira: string) {
     if (feeNaira === "") {
-      setDeliveryZones((prev) => prev.filter((z) => z.state !== state));
+      setDeliveryZones((prev) => {
+        const existing = prev.find((z) => z.state === state);
+        if (existing?.freeDeliveryLocation) {
+          const confirmed = window.confirm(
+            `Clearing the fee for ${state} will also remove the free-delivery landmark you set ("${existing.freeDeliveryLocation}"). Continue?`
+          );
+          if (!confirmed) return prev;
+        }
+        return prev.filter((z) => z.state !== state);
+      });
       return;
     }
     const parsed = Number(feeNaira);
@@ -173,7 +186,16 @@ export default function SettingsClient({
     setDeliveryZones((prev) => {
       const existing = prev.find((z) => z.state === state);
       if (existing) return prev.map((z) => z.state === state ? { ...z, feeKobo } : z);
-      return [...prev, { state, feeKobo }];
+      return [...prev, { state, feeKobo, freeDeliveryLocation: null }];
+    });
+  }
+
+  function setZoneLocation(state: string, location: string) {
+    // Only meaningful once a fee is set for this state — a zone must exist first.
+    setDeliveryZones((prev) => {
+      const existing = prev.find((z) => z.state === state);
+      if (!existing) return prev;
+      return prev.map((z) => z.state === state ? { ...z, freeDeliveryLocation: location || null } : z);
     });
   }
 
@@ -377,6 +399,7 @@ export default function SettingsClient({
           {NIGERIAN_STATES.map((state) => {
             const fee = getZoneFee(state);
             const feeNaira = fee === null ? "" : String(fee / 100);
+            const location = getZoneLocation(state);
             return (
               <div key={state}>
                 <label style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#999", display: "block", marginBottom: 4 }}>{state}</label>
@@ -392,6 +415,16 @@ export default function SettingsClient({
                     style={{ ...inputStyle, paddingLeft: 26, fontSize: 13, padding: "8px 10px 8px 26px" }}
                   />
                 </div>
+                {fee !== null && fee > 0 && (
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => { setDeliveryError(""); setZoneLocation(state, e.target.value.slice(0, 200)); }}
+                    placeholder="Free delivery near… (optional)"
+                    maxLength={200}
+                    style={{ ...inputStyle, fontSize: 12, padding: "7px 10px", marginTop: 6 }}
+                  />
+                )}
               </div>
             );
           })}

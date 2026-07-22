@@ -50,9 +50,10 @@ export default function CheckoutModal({
   const [error, setError] = useState("");
   const [codeInput, setCodeInput] = useState("");
   const [codeState, setCodeState] = useState<"idle" | "checking" | "ok" | "invalid">("idle");
-  const [deliveryZones, setDeliveryZones] = useState<{ state: string; feeKobo: number }[]>([]);
+  const [deliveryZones, setDeliveryZones] = useState<{ state: string; feeKobo: number; freeDeliveryLocation: string | null }[]>([]);
   const [zonesLoaded, setZonesLoaded] = useState(false);
   const [zonesError, setZonesError] = useState(false);
+  const [claimsFreeDelivery, setClaimsFreeDelivery] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -65,18 +66,32 @@ export default function CheckoutModal({
   }, [isOpen, storeSlug]);
 
   function set(field: string) {
-    return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      if (field === "state") setClaimsFreeDelivery(null); // reset the claim when the state changes
       setForm((f) => ({ ...f, [field]: e.target.value }));
+    };
   }
 
   const hasAnyZones = deliveryZones.length > 0;
-  const deliveryFee = zonesError
+  const selectedZone = form.state ? deliveryZones.find((z) => z.state === form.state) ?? null : null;
+  const freeDeliveryOffer = selectedZone?.freeDeliveryLocation?.trim() || null;
+  const rawDeliveryFee = zonesError
     ? -2  // -2 = could not load zones; block checkout
+    : !zonesLoaded && !hasAnyZones
+    ? null // first load with nothing cached yet — don't guess a price; a reopen with
+           // already-fetched zones keeps using them instead of re-blanking the summary
     : !form.state
     ? null
     : !hasAnyZones
     ? 0  // vendor hasn't configured zones — treat as free (no delivery restriction)
-    : (deliveryZones.find((z) => z.state === form.state)?.feeKobo ?? -1); // -1 = state not served
+    : (selectedZone?.feeKobo ?? -1); // -1 = state not served
+  // Buyer must answer the free-delivery prompt before the fee is settled, if one applies
+  const awaitingFreeDeliveryAnswer =
+    rawDeliveryFee !== null && rawDeliveryFee >= 0 && !!freeDeliveryOffer && claimsFreeDelivery === null;
+  const deliveryFee =
+    rawDeliveryFee !== null && rawDeliveryFee >= 0 && freeDeliveryOffer && claimsFreeDelivery
+      ? 0
+      : rawDeliveryFee;
 
   async function applyCode() {
     const code = codeInput.trim().toUpperCase();
@@ -100,7 +115,7 @@ export default function CheckoutModal({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (stateNotServed || zonesLoadError) return;
+    if (stateNotServed || zonesLoadError || awaitingFreeDeliveryAnswer) return;
     setError("");
     setLoading(true);
     try {
@@ -117,6 +132,7 @@ export default function CheckoutModal({
           deliveryNote: form.note,
           items: cart.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity })),
           affiliateCode,
+          claimsFreeDelivery: !!claimsFreeDelivery,
         }),
       });
       const data = await res.json();
@@ -183,6 +199,29 @@ export default function CheckoutModal({
               <p style={{ margin: "2px 0 0", fontSize: 11, color: "#DC2626" }}>
                 This store doesn&apos;t deliver to {form.state}. Please select a different state or contact the vendor.
               </p>
+            )}
+            {freeDeliveryOffer && rawDeliveryFee !== null && rawDeliveryFee >= 0 && (
+              <div style={{ background: "#F6FDE8", border: "1px solid #D4EFA0", borderRadius: 8, padding: "10px 12px", marginTop: 2 }}>
+                <p style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 600, color: "#2D6A00" }}>
+                  Are you close to {freeDeliveryOffer}? Buyers near there get free delivery.
+                </p>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button
+                    type="button"
+                    onClick={() => setClaimsFreeDelivery(true)}
+                    style={{ flex: 1, padding: "7px 0", fontSize: 12, fontWeight: 700, borderRadius: 6, cursor: "pointer", border: claimsFreeDelivery === true ? "1.5px solid #2D6A00" : "1.5px solid #D4EFA0", background: claimsFreeDelivery === true ? "#2D6A00" : "white", color: claimsFreeDelivery === true ? "white" : "#2D6A00" }}
+                  >
+                    Yes, I&apos;m close
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setClaimsFreeDelivery(false)}
+                    style={{ flex: 1, padding: "7px 0", fontSize: 12, fontWeight: 700, borderRadius: 6, cursor: "pointer", border: claimsFreeDelivery === false ? "1.5px solid #888" : "1.5px solid #D4EFA0", background: claimsFreeDelivery === false ? "#888" : "white", color: claimsFreeDelivery === false ? "white" : "#4A7C10" }}
+                  >
+                    No
+                  </button>
+                </div>
+              </div>
             )}
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
               <span style={{ color: "#666" }}>Paystack processing fee</span>
@@ -271,9 +310,9 @@ export default function CheckoutModal({
             </div>
           )}
 
-          <button type="submit" disabled={loading || stateNotServed || zonesLoadError}
-            style={{ width: "100%", padding: "14px", background: loading || stateNotServed || zonesLoadError ? "#888" : "#1A1A1A", color: "white", border: "none", borderRadius: 8, cursor: loading || stateNotServed || zonesLoadError ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", marginTop: 4 }}>
-            {loading ? "Processing…" : stateNotServed ? "Delivery not available" : zonesLoadError ? "Reload to continue" : `Pay ${formatNaira(total)} via Paystack`}
+          <button type="submit" disabled={loading || stateNotServed || zonesLoadError || awaitingFreeDeliveryAnswer}
+            style={{ width: "100%", padding: "14px", background: loading || stateNotServed || zonesLoadError || awaitingFreeDeliveryAnswer ? "#888" : "#1A1A1A", color: "white", border: "none", borderRadius: 8, cursor: loading || stateNotServed || zonesLoadError || awaitingFreeDeliveryAnswer ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", marginTop: 4 }}>
+            {loading ? "Processing…" : stateNotServed ? "Delivery not available" : zonesLoadError ? "Reload to continue" : awaitingFreeDeliveryAnswer ? "Answer the delivery question above" : `Pay ${formatNaira(total)} via Paystack`}
           </button>
           <p style={{ textAlign: "center", fontSize: 11, color: "#BBB", margin: 0 }}>Payments are secured by Paystack</p>
         </form>

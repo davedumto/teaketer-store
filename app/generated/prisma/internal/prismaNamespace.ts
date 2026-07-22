@@ -1268,6 +1268,7 @@ export const OrderScalarFieldEnum = {
   status: 'status',
   totalAmount: 'totalAmount',
   deliveryFee: 'deliveryFee',
+  freeDeliveryClaimed: 'freeDeliveryClaimed',
   platformFeeAmount: 'platformFeeAmount',
   affiliateAmount: 'affiliateAmount',
   vendorAmount: 'vendorAmount',
@@ -1335,7 +1336,8 @@ export const DeliveryZoneScalarFieldEnum = {
   id: 'id',
   vendorId: 'vendorId',
   state: 'state',
-  feeKobo: 'feeKobo'
+  feeKobo: 'feeKobo',
+  freeDeliveryLocation: 'freeDeliveryLocation'
 } as const
 
 export type DeliveryZoneScalarFieldEnum = (typeof DeliveryZoneScalarFieldEnum)[keyof typeof DeliveryZoneScalarFieldEnum]

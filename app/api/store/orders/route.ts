@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { rateLimit, getClientIp, rateLimitResponse } from "@/lib/rateLimit";
-import { computeSplit, getPlatformCommissionBps, initializeOrderCheckout } from "@/lib/commerce";
+import { computeSplit, getPlatformCommissionBps, initializeOrderCheckout, resolveDeliveryFee } from "@/lib/commerce";
 import { calculatePaystackFee } from "@/lib/paystackFee";
 import { appUrl } from "@/lib/utils";
 
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   const {
     storeSlug, buyerName, buyerEmail, buyerPhone,
     deliveryAddress, deliveryState, deliveryNote,
-    items: rawItems, affiliateCode,
+    items: rawItems, affiliateCode, claimsFreeDelivery,
   } = body as Record<string, unknown>;
 
   if (
@@ -117,12 +117,17 @@ export async function POST(req: NextRequest) {
   const subtotalAmount = resolvedItems.reduce((sum, i) => sum + i.priceKobo * i.quantity, 0);
 
   // Look up delivery fee server-side — not from client
-  const zones = await prisma.$queryRaw<{ feeKobo: number }[]>`
-    SELECT feeKobo FROM DeliveryZone
+  const zones = await prisma.$queryRaw<{ feeKobo: number; freeDeliveryLocation: string | null }[]>`
+    SELECT feeKobo, freeDeliveryLocation FROM DeliveryZone
     WHERE vendorId = ${vendor.id} AND state = ${deliveryState}
     LIMIT 1
   `;
-  const deliveryFee = zones[0]?.feeKobo ?? 0;
+  const zone = zones[0] ?? null;
+  const buyerClaimedFreeDelivery = claimsFreeDelivery === true;
+  const deliveryFee = resolveDeliveryFee(zone, buyerClaimedFreeDelivery);
+  // Only record the claim as "used" if it actually waived the fee — a claim
+  // on a zone with no free-delivery offer is a no-op, not worth flagging.
+  const freeDeliveryClaimed = buyerClaimedFreeDelivery && deliveryFee === 0 && (zone?.feeKobo ?? 0) > 0;
   const totalAmount = subtotalAmount + deliveryFee;
 
   const platformCommissionBps = await getPlatformCommissionBps();
@@ -149,6 +154,7 @@ export async function POST(req: NextRequest) {
       reference,
       totalAmount,
       deliveryFee,
+      freeDeliveryClaimed,
       platformFeeAmount,
       affiliateAmount,
       vendorAmount,

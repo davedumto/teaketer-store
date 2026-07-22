@@ -39,6 +39,7 @@ export type DeliveryZoneMinAggregateOutputType = {
   vendorId: string | null
   state: string | null
   feeKobo: number | null
+  freeDeliveryLocation: string | null
 }
 
 export type DeliveryZoneMaxAggregateOutputType = {
@@ -46,6 +47,7 @@ export type DeliveryZoneMaxAggregateOutputType = {
   vendorId: string | null
   state: string | null
   feeKobo: number | null
+  freeDeliveryLocation: string | null
 }
 
 export type DeliveryZoneCountAggregateOutputType = {
@@ -53,6 +55,7 @@ export type DeliveryZoneCountAggregateOutputType = {
   vendorId: number
   state: number
   feeKobo: number
+  freeDeliveryLocation: number
   _all: number
 }
 
@@ -70,6 +73,7 @@ export type DeliveryZoneMinAggregateInputType = {
   vendorId?: true
   state?: true
   feeKobo?: true
+  freeDeliveryLocation?: true
 }
 
 export type DeliveryZoneMaxAggregateInputType = {
@@ -77,6 +81,7 @@ export type DeliveryZoneMaxAggregateInputType = {
   vendorId?: true
   state?: true
   feeKobo?: true
+  freeDeliveryLocation?: true
 }
 
 export type DeliveryZoneCountAggregateInputType = {
@@ -84,6 +89,7 @@ export type DeliveryZoneCountAggregateInputType = {
   vendorId?: true
   state?: true
   feeKobo?: true
+  freeDeliveryLocation?: true
   _all?: true
 }
 
@@ -178,6 +184,7 @@ export type DeliveryZoneGroupByOutputType = {
   vendorId: string
   state: string
   feeKobo: number
+  freeDeliveryLocation: string | null
   _count: DeliveryZoneCountAggregateOutputType | null
   _avg: DeliveryZoneAvgAggregateOutputType | null
   _sum: DeliveryZoneSumAggregateOutputType | null
@@ -208,6 +215,7 @@ export type DeliveryZoneWhereInput = {
   vendorId?: Prisma.StringFilter<"DeliveryZone"> | string
   state?: Prisma.StringFilter<"DeliveryZone"> | string
   feeKobo?: Prisma.IntFilter<"DeliveryZone"> | number
+  freeDeliveryLocation?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
   vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>
 }
 
@@ -216,6 +224,7 @@ export type DeliveryZoneOrderByWithRelationInput = {
   vendorId?: Prisma.SortOrder
   state?: Prisma.SortOrder
   feeKobo?: Prisma.SortOrder
+  freeDeliveryLocation?: Prisma.SortOrderInput | Prisma.SortOrder
   vendor?: Prisma.VendorOrderByWithRelationInput
 }
 
@@ -228,6 +237,7 @@ export type DeliveryZoneWhereUniqueInput = Prisma.AtLeast<{
   vendorId?: Prisma.StringFilter<"DeliveryZone"> | string
   state?: Prisma.StringFilter<"DeliveryZone"> | string
   feeKobo?: Prisma.IntFilter<"DeliveryZone"> | number
+  freeDeliveryLocation?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
   vendor?: Prisma.XOR<Prisma.VendorScalarRelationFilter, Prisma.VendorWhereInput>
 }, "id" | "vendorId_state">
 
@@ -236,6 +246,7 @@ export type DeliveryZoneOrderByWithAggregationInput = {
   vendorId?: Prisma.SortOrder
   state?: Prisma.SortOrder
   feeKobo?: Prisma.SortOrder
+  freeDeliveryLocation?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.DeliveryZoneCountOrderByAggregateInput
   _avg?: Prisma.DeliveryZoneAvgOrderByAggregateInput
   _max?: Prisma.DeliveryZoneMaxOrderByAggregateInput
@@ -251,12 +262,14 @@ export type DeliveryZoneScalarWhereWithAggregatesInput = {
   vendorId?: Prisma.StringWithAggregatesFilter<"DeliveryZone"> | string
   state?: Prisma.StringWithAggregatesFilter<"DeliveryZone"> | string
   feeKobo?: Prisma.IntWithAggregatesFilter<"DeliveryZone"> | number
+  freeDeliveryLocation?: Prisma.StringNullableWithAggregatesFilter<"DeliveryZone"> | string | null
 }
 
 export type DeliveryZoneCreateInput = {
   id?: string
   state: string
   feeKobo: number
+  freeDeliveryLocation?: string | null
   vendor: Prisma.VendorCreateNestedOneWithoutDeliveryZonesInput
 }
 
@@ -265,12 +278,14 @@ export type DeliveryZoneUncheckedCreateInput = {
   vendorId: string
   state: string
   feeKobo: number
+  freeDeliveryLocation?: string | null
 }
 
 export type DeliveryZoneUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   feeKobo?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vendor?: Prisma.VendorUpdateOneRequiredWithoutDeliveryZonesNestedInput
 }
 
@@ -279,6 +294,7 @@ export type DeliveryZoneUncheckedUpdateInput = {
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   feeKobo?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DeliveryZoneCreateManyInput = {
@@ -286,12 +302,14 @@ export type DeliveryZoneCreateManyInput = {
   vendorId: string
   state: string
   feeKobo: number
+  freeDeliveryLocation?: string | null
 }
 
 export type DeliveryZoneUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   feeKobo?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DeliveryZoneUncheckedUpdateManyInput = {
@@ -299,6 +317,7 @@ export type DeliveryZoneUncheckedUpdateManyInput = {
   vendorId?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   feeKobo?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DeliveryZoneListRelationFilter = {
@@ -321,6 +340,7 @@ export type DeliveryZoneCountOrderByAggregateInput = {
   vendorId?: Prisma.SortOrder
   state?: Prisma.SortOrder
   feeKobo?: Prisma.SortOrder
+  freeDeliveryLocation?: Prisma.SortOrder
 }
 
 export type DeliveryZoneAvgOrderByAggregateInput = {
@@ -332,6 +352,7 @@ export type DeliveryZoneMaxOrderByAggregateInput = {
   vendorId?: Prisma.SortOrder
   state?: Prisma.SortOrder
   feeKobo?: Prisma.SortOrder
+  freeDeliveryLocation?: Prisma.SortOrder
 }
 
 export type DeliveryZoneMinOrderByAggregateInput = {
@@ -339,6 +360,7 @@ export type DeliveryZoneMinOrderByAggregateInput = {
   vendorId?: Prisma.SortOrder
   state?: Prisma.SortOrder
   feeKobo?: Prisma.SortOrder
+  freeDeliveryLocation?: Prisma.SortOrder
 }
 
 export type DeliveryZoneSumOrderByAggregateInput = {
@@ -391,12 +413,14 @@ export type DeliveryZoneCreateWithoutVendorInput = {
   id?: string
   state: string
   feeKobo: number
+  freeDeliveryLocation?: string | null
 }
 
 export type DeliveryZoneUncheckedCreateWithoutVendorInput = {
   id?: string
   state: string
   feeKobo: number
+  freeDeliveryLocation?: string | null
 }
 
 export type DeliveryZoneCreateOrConnectWithoutVendorInput = {
@@ -432,30 +456,35 @@ export type DeliveryZoneScalarWhereInput = {
   vendorId?: Prisma.StringFilter<"DeliveryZone"> | string
   state?: Prisma.StringFilter<"DeliveryZone"> | string
   feeKobo?: Prisma.IntFilter<"DeliveryZone"> | number
+  freeDeliveryLocation?: Prisma.StringNullableFilter<"DeliveryZone"> | string | null
 }
 
 export type DeliveryZoneCreateManyVendorInput = {
   id?: string
   state: string
   feeKobo: number
+  freeDeliveryLocation?: string | null
 }
 
 export type DeliveryZoneUpdateWithoutVendorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   feeKobo?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DeliveryZoneUncheckedUpdateWithoutVendorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   feeKobo?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DeliveryZoneUncheckedUpdateManyWithoutVendorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
   feeKobo?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -465,6 +494,7 @@ export type DeliveryZoneSelect<ExtArgs extends runtime.Types.Extensions.Internal
   vendorId?: boolean
   state?: boolean
   feeKobo?: boolean
+  freeDeliveryLocation?: boolean
   vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["deliveryZone"]>
 
@@ -473,6 +503,7 @@ export type DeliveryZoneSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   vendorId?: boolean
   state?: boolean
   feeKobo?: boolean
+  freeDeliveryLocation?: boolean
   vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["deliveryZone"]>
 
@@ -481,6 +512,7 @@ export type DeliveryZoneSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   vendorId?: boolean
   state?: boolean
   feeKobo?: boolean
+  freeDeliveryLocation?: boolean
   vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["deliveryZone"]>
 
@@ -489,9 +521,10 @@ export type DeliveryZoneSelectScalar = {
   vendorId?: boolean
   state?: boolean
   feeKobo?: boolean
+  freeDeliveryLocation?: boolean
 }
 
-export type DeliveryZoneOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "state" | "feeKobo", ExtArgs["result"]["deliveryZone"]>
+export type DeliveryZoneOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "state" | "feeKobo" | "freeDeliveryLocation", ExtArgs["result"]["deliveryZone"]>
 export type DeliveryZoneInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
 }
@@ -512,6 +545,7 @@ export type $DeliveryZonePayload<ExtArgs extends runtime.Types.Extensions.Intern
     vendorId: string
     state: string
     feeKobo: number
+    freeDeliveryLocation: string | null
   }, ExtArgs["result"]["deliveryZone"]>
   composites: {}
 }
@@ -940,6 +974,7 @@ export interface DeliveryZoneFieldRefs {
   readonly vendorId: Prisma.FieldRef<"DeliveryZone", 'String'>
   readonly state: Prisma.FieldRef<"DeliveryZone", 'String'>
   readonly feeKobo: Prisma.FieldRef<"DeliveryZone", 'Int'>
+  readonly freeDeliveryLocation: Prisma.FieldRef<"DeliveryZone", 'String'>
 }
     
 

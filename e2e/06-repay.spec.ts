@@ -110,6 +110,32 @@ test.describe("Repay flow — buyer UI", () => {
     await expect(page.getByText(/paystack processing fee/i)).toBeVisible({ timeout: 5000 });
   });
 
+  test("free-delivery prompt appears and waives the delivery fee when claimed", async ({ page }) => {
+    await page.goto(`/shop/${SLUG}`);
+    const addBtn = page.getByRole("button", { name: /add to bag/i }).first();
+    await expect(addBtn).toBeVisible({ timeout: 8000 });
+    await addBtn.click();
+    await expect(page.getByRole("button", { name: /checkout/i })).toBeVisible({ timeout: 5000 });
+    await page.getByRole("button", { name: /checkout/i }).click();
+
+    // Select a state — the prompt only appears if that zone has a free-delivery location configured
+    await page.locator("select").filter({ hasText: /select/i }).selectOption("Lagos");
+
+    const prompt = page.getByText(/are you close to/i);
+    const promptVisible = await prompt.isVisible({ timeout: 3000 }).catch(() => false);
+    if (!promptVisible) {
+      test.skip(); // configured test store has no free-delivery zone for Lagos — nothing to assert
+      return;
+    }
+
+    // Submit is blocked until the buyer answers
+    await expect(page.getByRole("button", { name: /answer the delivery question/i })).toBeVisible();
+
+    await page.getByRole("button", { name: /yes, i'm close/i }).click();
+    await expect(page.getByText(/^free$/i)).toBeVisible({ timeout: 3000 });
+    await expect(page.getByRole("button", { name: /answer the delivery question/i })).not.toBeVisible();
+  });
+
   test("repay charges the same total as the original checkout (fee not recomputed)", async ({ page }) => {
     const reference = await createPendingOrder(page, `repay-samefee-${Date.now()}@e2etest.com`);
     if (!reference) { test.skip(); return; }

@@ -22,6 +22,8 @@ export interface OrderDetail {
   deliveryAddress: string;
   deliveryState: string;
   deliveryNote: string;
+  deliveryFee: number;
+  freeDeliveryClaimed: boolean;
   totalAmount: number;
   createdAt: Date;
   items: OrderItem[];
@@ -222,6 +224,14 @@ export default function OrderDetailDrawer({
             <CopyField label="State" value={order.deliveryState} />
             <CopyField label="Address" value={order.deliveryAddress} />
             {order.deliveryNote && <CopyField label="Note" value={order.deliveryNote} />}
+            {order.freeDeliveryClaimed && (
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 8, background: "#FFF9E6", border: "1px solid #F5C518", borderRadius: 8, padding: "10px 12px", marginTop: 4 }}>
+                <span style={{ fontSize: 13 }}>⚠️</span>
+                <span style={{ fontSize: 12, color: "#7A5700", fontWeight: 600, lineHeight: 1.4 }}>
+                  Buyer claimed free delivery for being close to your specified location — delivery fee was waived (₦0). Double-check the address above before fulfilling.
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Section: Items */}

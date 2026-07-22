@@ -113,6 +113,9 @@ model Order {
   status          String      @default("pending") // pending | paid | fulfilled | cancelled | refunding | refunded
   totalAmount     Int
   deliveryFee     Int         @default(0)
+  // Buyer self-declared "I'm close to the vendor's free-delivery landmark" claim.
+  // Not independently verified — vendor-visible only, so they can spot-check before fulfilling.
+  freeDeliveryClaimed Boolean @default(false)
   platformFeeAmount Int       @default(0)
   affiliateAmount Int         @default(0)
   vendorAmount    Int         @default(0)
@@ -199,11 +202,14 @@ model AffiliatePayout {
 // ─── Delivery zones ──────────────────────────────────────────────────────────
 
 model DeliveryZone {
-  id        String  @id @default(cuid())
-  vendorId  String
-  vendor    Vendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-  state     String  // Nigerian state name
-  feeKobo   Int     // delivery fee in kobo (0 = free)
+  id                    String  @id @default(cuid())
+  vendorId              String
+  vendor                Vendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  state                 String  // Nigerian state name
+  feeKobo               Int     // delivery fee in kobo (0 = free)
+  // Optional free-text landmark (e.g. "within 5km of Ikeja City Mall").
+  // Null/empty = vendor offers no free-delivery waiver for this state.
+  freeDeliveryLocation  String?
 
   @@unique([vendorId, state])
   @@index([vendorId])

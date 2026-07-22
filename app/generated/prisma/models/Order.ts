@@ -60,6 +60,7 @@ export type OrderMinAggregateOutputType = {
   status: string | null
   totalAmount: number | null
   deliveryFee: number | null
+  freeDeliveryClaimed: boolean | null
   platformFeeAmount: number | null
   affiliateAmount: number | null
   vendorAmount: number | null
@@ -87,6 +88,7 @@ export type OrderMaxAggregateOutputType = {
   status: string | null
   totalAmount: number | null
   deliveryFee: number | null
+  freeDeliveryClaimed: boolean | null
   platformFeeAmount: number | null
   affiliateAmount: number | null
   vendorAmount: number | null
@@ -114,6 +116,7 @@ export type OrderCountAggregateOutputType = {
   status: number
   totalAmount: number
   deliveryFee: number
+  freeDeliveryClaimed: number
   platformFeeAmount: number
   affiliateAmount: number
   vendorAmount: number
@@ -163,6 +166,7 @@ export type OrderMinAggregateInputType = {
   status?: true
   totalAmount?: true
   deliveryFee?: true
+  freeDeliveryClaimed?: true
   platformFeeAmount?: true
   affiliateAmount?: true
   vendorAmount?: true
@@ -190,6 +194,7 @@ export type OrderMaxAggregateInputType = {
   status?: true
   totalAmount?: true
   deliveryFee?: true
+  freeDeliveryClaimed?: true
   platformFeeAmount?: true
   affiliateAmount?: true
   vendorAmount?: true
@@ -217,6 +222,7 @@ export type OrderCountAggregateInputType = {
   status?: true
   totalAmount?: true
   deliveryFee?: true
+  freeDeliveryClaimed?: true
   platformFeeAmount?: true
   affiliateAmount?: true
   vendorAmount?: true
@@ -331,6 +337,7 @@ export type OrderGroupByOutputType = {
   status: string
   totalAmount: number
   deliveryFee: number
+  freeDeliveryClaimed: boolean
   platformFeeAmount: number
   affiliateAmount: number
   vendorAmount: number
@@ -381,6 +388,7 @@ export type OrderWhereInput = {
   status?: Prisma.StringFilter<"Order"> | string
   totalAmount?: Prisma.IntFilter<"Order"> | number
   deliveryFee?: Prisma.IntFilter<"Order"> | number
+  freeDeliveryClaimed?: Prisma.BoolFilter<"Order"> | boolean
   platformFeeAmount?: Prisma.IntFilter<"Order"> | number
   affiliateAmount?: Prisma.IntFilter<"Order"> | number
   vendorAmount?: Prisma.IntFilter<"Order"> | number
@@ -412,6 +420,7 @@ export type OrderOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   deliveryFee?: Prisma.SortOrder
+  freeDeliveryClaimed?: Prisma.SortOrder
   platformFeeAmount?: Prisma.SortOrder
   affiliateAmount?: Prisma.SortOrder
   vendorAmount?: Prisma.SortOrder
@@ -446,6 +455,7 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.StringFilter<"Order"> | string
   totalAmount?: Prisma.IntFilter<"Order"> | number
   deliveryFee?: Prisma.IntFilter<"Order"> | number
+  freeDeliveryClaimed?: Prisma.BoolFilter<"Order"> | boolean
   platformFeeAmount?: Prisma.IntFilter<"Order"> | number
   affiliateAmount?: Prisma.IntFilter<"Order"> | number
   vendorAmount?: Prisma.IntFilter<"Order"> | number
@@ -477,6 +487,7 @@ export type OrderOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   deliveryFee?: Prisma.SortOrder
+  freeDeliveryClaimed?: Prisma.SortOrder
   platformFeeAmount?: Prisma.SortOrder
   affiliateAmount?: Prisma.SortOrder
   vendorAmount?: Prisma.SortOrder
@@ -512,6 +523,7 @@ export type OrderScalarWhereWithAggregatesInput = {
   status?: Prisma.StringWithAggregatesFilter<"Order"> | string
   totalAmount?: Prisma.IntWithAggregatesFilter<"Order"> | number
   deliveryFee?: Prisma.IntWithAggregatesFilter<"Order"> | number
+  freeDeliveryClaimed?: Prisma.BoolWithAggregatesFilter<"Order"> | boolean
   platformFeeAmount?: Prisma.IntWithAggregatesFilter<"Order"> | number
   affiliateAmount?: Prisma.IntWithAggregatesFilter<"Order"> | number
   vendorAmount?: Prisma.IntWithAggregatesFilter<"Order"> | number
@@ -537,6 +549,7 @@ export type OrderCreateInput = {
   status?: string
   totalAmount: number
   deliveryFee?: number
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: number
   affiliateAmount?: number
   vendorAmount?: number
@@ -568,6 +581,7 @@ export type OrderUncheckedCreateInput = {
   status?: string
   totalAmount: number
   deliveryFee?: number
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: number
   affiliateAmount?: number
   vendorAmount?: number
@@ -595,6 +609,7 @@ export type OrderUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   totalAmount?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryClaimed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
   affiliateAmount?: Prisma.IntFieldUpdateOperationsInput | number
   vendorAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -626,6 +641,7 @@ export type OrderUncheckedUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   totalAmount?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryClaimed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
   affiliateAmount?: Prisma.IntFieldUpdateOperationsInput | number
   vendorAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -655,6 +671,7 @@ export type OrderCreateManyInput = {
   status?: string
   totalAmount: number
   deliveryFee?: number
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: number
   affiliateAmount?: number
   vendorAmount?: number
@@ -680,6 +697,7 @@ export type OrderUpdateManyMutationInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   totalAmount?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryClaimed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
   affiliateAmount?: Prisma.IntFieldUpdateOperationsInput | number
   vendorAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -707,6 +725,7 @@ export type OrderUncheckedUpdateManyInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   totalAmount?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryClaimed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
   affiliateAmount?: Prisma.IntFieldUpdateOperationsInput | number
   vendorAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -744,6 +763,7 @@ export type OrderCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   deliveryFee?: Prisma.SortOrder
+  freeDeliveryClaimed?: Prisma.SortOrder
   platformFeeAmount?: Prisma.SortOrder
   affiliateAmount?: Prisma.SortOrder
   vendorAmount?: Prisma.SortOrder
@@ -781,6 +801,7 @@ export type OrderMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   deliveryFee?: Prisma.SortOrder
+  freeDeliveryClaimed?: Prisma.SortOrder
   platformFeeAmount?: Prisma.SortOrder
   affiliateAmount?: Prisma.SortOrder
   vendorAmount?: Prisma.SortOrder
@@ -808,6 +829,7 @@ export type OrderMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   deliveryFee?: Prisma.SortOrder
+  freeDeliveryClaimed?: Prisma.SortOrder
   platformFeeAmount?: Prisma.SortOrder
   affiliateAmount?: Prisma.SortOrder
   vendorAmount?: Prisma.SortOrder
@@ -968,6 +990,7 @@ export type OrderCreateWithoutVendorInput = {
   status?: string
   totalAmount: number
   deliveryFee?: number
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: number
   affiliateAmount?: number
   vendorAmount?: number
@@ -997,6 +1020,7 @@ export type OrderUncheckedCreateWithoutVendorInput = {
   status?: string
   totalAmount: number
   deliveryFee?: number
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: number
   affiliateAmount?: number
   vendorAmount?: number
@@ -1054,6 +1078,7 @@ export type OrderScalarWhereInput = {
   status?: Prisma.StringFilter<"Order"> | string
   totalAmount?: Prisma.IntFilter<"Order"> | number
   deliveryFee?: Prisma.IntFilter<"Order"> | number
+  freeDeliveryClaimed?: Prisma.BoolFilter<"Order"> | boolean
   platformFeeAmount?: Prisma.IntFilter<"Order"> | number
   affiliateAmount?: Prisma.IntFilter<"Order"> | number
   vendorAmount?: Prisma.IntFilter<"Order"> | number
@@ -1079,6 +1104,7 @@ export type OrderCreateWithoutItemsInput = {
   status?: string
   totalAmount: number
   deliveryFee?: number
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: number
   affiliateAmount?: number
   vendorAmount?: number
@@ -1109,6 +1135,7 @@ export type OrderUncheckedCreateWithoutItemsInput = {
   status?: string
   totalAmount: number
   deliveryFee?: number
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: number
   affiliateAmount?: number
   vendorAmount?: number
@@ -1151,6 +1178,7 @@ export type OrderUpdateWithoutItemsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   totalAmount?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryClaimed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
   affiliateAmount?: Prisma.IntFieldUpdateOperationsInput | number
   vendorAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1181,6 +1209,7 @@ export type OrderUncheckedUpdateWithoutItemsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   totalAmount?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryClaimed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
   affiliateAmount?: Prisma.IntFieldUpdateOperationsInput | number
   vendorAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1207,6 +1236,7 @@ export type OrderCreateWithoutAffiliateInput = {
   status?: string
   totalAmount: number
   deliveryFee?: number
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: number
   affiliateAmount?: number
   vendorAmount?: number
@@ -1236,6 +1266,7 @@ export type OrderUncheckedCreateWithoutAffiliateInput = {
   status?: string
   totalAmount: number
   deliveryFee?: number
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: number
   affiliateAmount?: number
   vendorAmount?: number
@@ -1288,6 +1319,7 @@ export type OrderCreateWithoutAffiliatePayoutInput = {
   status?: string
   totalAmount: number
   deliveryFee?: number
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: number
   affiliateAmount?: number
   vendorAmount?: number
@@ -1318,6 +1350,7 @@ export type OrderUncheckedCreateWithoutAffiliatePayoutInput = {
   status?: string
   totalAmount: number
   deliveryFee?: number
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: number
   affiliateAmount?: number
   vendorAmount?: number
@@ -1360,6 +1393,7 @@ export type OrderUpdateWithoutAffiliatePayoutInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   totalAmount?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryClaimed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
   affiliateAmount?: Prisma.IntFieldUpdateOperationsInput | number
   vendorAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1390,6 +1424,7 @@ export type OrderUncheckedUpdateWithoutAffiliatePayoutInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   totalAmount?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryClaimed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
   affiliateAmount?: Prisma.IntFieldUpdateOperationsInput | number
   vendorAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1417,6 +1452,7 @@ export type OrderCreateManyVendorInput = {
   status?: string
   totalAmount: number
   deliveryFee?: number
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: number
   affiliateAmount?: number
   vendorAmount?: number
@@ -1442,6 +1478,7 @@ export type OrderUpdateWithoutVendorInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   totalAmount?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryClaimed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
   affiliateAmount?: Prisma.IntFieldUpdateOperationsInput | number
   vendorAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1471,6 +1508,7 @@ export type OrderUncheckedUpdateWithoutVendorInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   totalAmount?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryClaimed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
   affiliateAmount?: Prisma.IntFieldUpdateOperationsInput | number
   vendorAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1499,6 +1537,7 @@ export type OrderUncheckedUpdateManyWithoutVendorInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   totalAmount?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryClaimed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
   affiliateAmount?: Prisma.IntFieldUpdateOperationsInput | number
   vendorAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1525,6 +1564,7 @@ export type OrderCreateManyAffiliateInput = {
   status?: string
   totalAmount: number
   deliveryFee?: number
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: number
   affiliateAmount?: number
   vendorAmount?: number
@@ -1550,6 +1590,7 @@ export type OrderUpdateWithoutAffiliateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   totalAmount?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryClaimed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
   affiliateAmount?: Prisma.IntFieldUpdateOperationsInput | number
   vendorAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1579,6 +1620,7 @@ export type OrderUncheckedUpdateWithoutAffiliateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   totalAmount?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryClaimed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
   affiliateAmount?: Prisma.IntFieldUpdateOperationsInput | number
   vendorAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1607,6 +1649,7 @@ export type OrderUncheckedUpdateManyWithoutAffiliateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   totalAmount?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
+  freeDeliveryClaimed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
   affiliateAmount?: Prisma.IntFieldUpdateOperationsInput | number
   vendorAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1665,6 +1708,7 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   status?: boolean
   totalAmount?: boolean
   deliveryFee?: boolean
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: boolean
   affiliateAmount?: boolean
   vendorAmount?: boolean
@@ -1697,6 +1741,7 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   status?: boolean
   totalAmount?: boolean
   deliveryFee?: boolean
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: boolean
   affiliateAmount?: boolean
   vendorAmount?: boolean
@@ -1726,6 +1771,7 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   status?: boolean
   totalAmount?: boolean
   deliveryFee?: boolean
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: boolean
   affiliateAmount?: boolean
   vendorAmount?: boolean
@@ -1755,6 +1801,7 @@ export type OrderSelectScalar = {
   status?: boolean
   totalAmount?: boolean
   deliveryFee?: boolean
+  freeDeliveryClaimed?: boolean
   platformFeeAmount?: boolean
   affiliateAmount?: boolean
   vendorAmount?: boolean
@@ -1768,7 +1815,7 @@ export type OrderSelectScalar = {
   updatedAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "affiliateId" | "buyerName" | "buyerEmail" | "buyerPhone" | "deliveryAddress" | "deliveryState" | "deliveryNote" | "reference" | "status" | "totalAmount" | "deliveryFee" | "platformFeeAmount" | "affiliateAmount" | "vendorAmount" | "paystackFeeAmount" | "paystackFeeActualKobo" | "affiliatePaidOut" | "paidAt" | "fulfilledAt" | "confirmationEmailedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "affiliateId" | "buyerName" | "buyerEmail" | "buyerPhone" | "deliveryAddress" | "deliveryState" | "deliveryNote" | "reference" | "status" | "totalAmount" | "deliveryFee" | "freeDeliveryClaimed" | "platformFeeAmount" | "affiliateAmount" | "vendorAmount" | "paystackFeeAmount" | "paystackFeeActualKobo" | "affiliatePaidOut" | "paidAt" | "fulfilledAt" | "confirmationEmailedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vendor?: boolean | Prisma.VendorDefaultArgs<ExtArgs>
   affiliate?: boolean | Prisma.Order$affiliateArgs<ExtArgs>
@@ -1807,6 +1854,7 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     status: string
     totalAmount: number
     deliveryFee: number
+    freeDeliveryClaimed: boolean
     platformFeeAmount: number
     affiliateAmount: number
     vendorAmount: number
@@ -2258,6 +2306,7 @@ export interface OrderFieldRefs {
   readonly status: Prisma.FieldRef<"Order", 'String'>
   readonly totalAmount: Prisma.FieldRef<"Order", 'Int'>
   readonly deliveryFee: Prisma.FieldRef<"Order", 'Int'>
+  readonly freeDeliveryClaimed: Prisma.FieldRef<"Order", 'Boolean'>
   readonly platformFeeAmount: Prisma.FieldRef<"Order", 'Int'>
   readonly affiliateAmount: Prisma.FieldRef<"Order", 'Int'>
   readonly vendorAmount: Prisma.FieldRef<"Order", 'Int'>

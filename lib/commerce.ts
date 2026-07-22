@@ -41,6 +41,23 @@ export function computeSplit(
   };
 }
 
+/**
+ * Resolves the delivery fee for a checkout given the vendor's zone config and
+ * the buyer's self-declared free-delivery claim. The waiver only applies if
+ * the vendor actually configured a free-delivery landmark for this zone —
+ * a buyer claiming free delivery on a zone with no such offer still pays the
+ * normal fee.
+ */
+export function resolveDeliveryFee(
+  zone: { feeKobo: number; freeDeliveryLocation: string | null } | null,
+  claimsFreeDelivery: boolean
+): number {
+  if (!zone) return 0;
+  const offersFreeDelivery = !!zone.freeDeliveryLocation?.trim();
+  if (claimsFreeDelivery && offersFreeDelivery) return 0;
+  return zone.feeKobo;
+}
+
 const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 export async function generateAffiliateCode(): Promise<string> {
   for (let attempt = 0; attempt < 10; attempt++) {

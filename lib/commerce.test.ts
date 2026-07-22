@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeSplit } from "./commerce";
+import { computeSplit, resolveDeliveryFee } from "./commerce";
 
 describe("computeSplit", () => {
   it("takes only the platform fee when there's no affiliate", () => {
@@ -72,5 +72,43 @@ describe("computeSplit", () => {
   it("handles a total of 0", () => {
     const result = computeSplit(0, 500, 1500, true);
     expect(result).toEqual({ platformFeeAmount: 0, affiliateAmount: 0, vendorAmount: 0 });
+  });
+});
+
+describe("resolveDeliveryFee", () => {
+  it("returns 0 when there's no zone at all", () => {
+    expect(resolveDeliveryFee(null, false)).toBe(0);
+    expect(resolveDeliveryFee(null, true)).toBe(0);
+  });
+
+  it("returns the flat fee when the buyer doesn't claim free delivery", () => {
+    const zone = { feeKobo: 150_000, freeDeliveryLocation: "Within 5km of Ikeja City Mall" };
+    expect(resolveDeliveryFee(zone, false)).toBe(150_000);
+  });
+
+  it("waives the fee when the buyer claims free delivery and the vendor offers it", () => {
+    const zone = { feeKobo: 150_000, freeDeliveryLocation: "Within 5km of Ikeja City Mall" };
+    expect(resolveDeliveryFee(zone, true)).toBe(0);
+  });
+
+  it("does NOT waive the fee if the buyer claims free delivery but the vendor never configured a location", () => {
+    const zone = { feeKobo: 150_000, freeDeliveryLocation: null };
+    expect(resolveDeliveryFee(zone, true)).toBe(150_000);
+  });
+
+  it("treats an empty/whitespace-only location as no offer", () => {
+    const zone = { feeKobo: 150_000, freeDeliveryLocation: "   " };
+    expect(resolveDeliveryFee(zone, true)).toBe(150_000);
+  });
+
+  it("charges the flat fee regardless of claim when the vendor's fee is already 0", () => {
+    const zone = { feeKobo: 0, freeDeliveryLocation: null };
+    expect(resolveDeliveryFee(zone, false)).toBe(0);
+    expect(resolveDeliveryFee(zone, true)).toBe(0);
+  });
+
+  it("a zone with a free-delivery location still charges the flat fee if not claimed", () => {
+    const zone = { feeKobo: 200_000, freeDeliveryLocation: "Near the Third Mainland Bridge toll" };
+    expect(resolveDeliveryFee(zone, false)).toBe(200_000);
   });
 });
